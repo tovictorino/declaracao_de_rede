@@ -102,7 +102,7 @@ m3 <- mapview(myshp, zcol="dummy",
               layer.name = 'Utilização da Capacidade Instalada',
               color = red)
 
-mapshot(m3, url = "Dados/DR_Interface_Grafica.html", selfcontained = FALSE)
+mapshot(m3, url = "DR_Interface_Grafica.html", selfcontained = FALSE)
 
 
 
