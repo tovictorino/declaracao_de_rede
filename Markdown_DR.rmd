@@ -1,0 +1,185 @@
+---
+  title:
+  output: html_document
+---
+
+# Declaração de Rede - Interface Gráfica
+***
+
+
+<style>
+body {
+text-align: justify}
+</style>
+
+# Introdução
+Entende-se por Declaração de Rede o documento apresentado obrigatoriamente à ANTT pelas concessionárias/subconcessionárias de serviço público de transporte ferroviário de cargas, o qual deve conter necessariamente um conjunto de informações a respeito da malha ferroviária federal concedida, nos termos da Resolução ANTT nº 3.695/2011, Anexo, art. 5º.
+  
+A DR tem por objetivo consolidar as informações técnico operacionais de todo o Subsistema Ferroviário Federal, ocupando lugar de destaque dentre os instrumentos regulatórios, contribuindo para a redução da assimetria de informações do setor.
+  
+Dentre outras informações, a Declaração de Rede deve conter o inventário de capacidade, ou seja, a capacidade instalada, a capacidade vinculada e a capacidade ociosa dos trechos ferroviários, informações relevantes, sobretudo para o mercado regulado e para os usuários, conforme consta da Resolução ANTT nº 3.695/2011, Anexo, art. 5º, inc. III.
+   
+Nesse contexto, com o objetivo de apresentar o Inventário de Capacidade de forma intuitiva, georreferenciada, interativa e, sobretudo, mais transparente, deu-se início ao projeto de criação da Interface Gráfica da Declaração de Rede.
+
+O presente documento apresentará o processo de criação e os resultados obtidos.
+
+# Equipe
+O Projeto foi desenvolvido pela equipe da Gerência de Regulação e Outorgas Ferroviárias.
+
+* Marcelo Amorelli - Gerente de Regulação e Outorgas - marcelo.amorelli@antt.gov.br
+* Gilson Matos - Coordenador de Regulamentação e Outorgas - gilson.matos@antt.gov.br
+* Leonardo Silva - Coordenador de Regulação dos Serviços Ferroviários - leonardo.silva@antt.gov.br
+* Thiago Victorino - Líder do Projeto - thiago.victorino@antt.gov.br
+
+# Da Implementação
+A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal` e `mapview.`
+
+### Da Manipulação das Bases de Dados
+Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
+
+A leitura da base de dados georreferenciada se deu através do pacote `rgdal`.
+
+``` {r eval = FALSE}
+library(rgdal)
+library(dplyr)
+
+# Leitura da base georreferenciadas
+myshp <- readOGR(dsn=path.expand("SFF_shapefile"),
+                 layer="dbo_tblLinhaEstacao_spatial_linestring", stringsAsFactors = FALSE)
+```
+
+A manipulação da base de dados georreferenciada se deu por meio dos pacotes `dplyr` e `plyr`.
+
+``` {r eval = FALSE}
+# Substituição dos dados da coluna CodigoFERR pelo nome da ferrovia
+tblFerrovia <- readxl::read_excel("tblFerrovia.xlsx")
+tblFerrovia$CodigoFerr <- tblFerrovia$CodigoFerrovia
+myshp@data <- plyr::join(myshp@data,
+                         tblFerrovia,
+                         by='CodigoFerr')
+
+# Substituição dos dados da coluna CodigoLi00 pelo nome da linha
+tblLinha <- readxl::read_excel("tblLinha.xlsx")
+tblLinha$CodigoLi00 <- tblLinha$CodigoLinha
+myshp@data <- plyr::join(myshp@data,
+                  tblLinha,
+                  by='CodigoLi00')
+
+# Substituição dos dados da coluna CodigoEstacao pelo código de três letras do nome da estação
+tblEstacao <- readxl::read_excel("tblEstacao.xlsx")
+tblEstacao$CodigoEsta <- tblEstacao$CodigoEstacao
+myshp@data <- plyr::join(myshp@data,
+                         tblEstacao,
+                         by='CodigoEsta')
+DR_2020 <- readxl::read_excel("dr2020_original.xlsx")
+DR_2020$linesta <- paste(DR_2020$Linha, DR_2020$B, sep='!')
+myshp@data$linesta <- paste(myshp@data$NomeLinha, myshp@data$CodigoTresLetrasEstacao, sep='!')
+myshp@data <- plyr::join(myshp@data,
+                         DR_2020,
+                         by='linesta')
+
+# Substituição dos dados da coluna CodigoBito pela sua classificação real
+{myshp@data[myshp@data[["CodigoBito"]] == '1', 'CodigoBito'] <- 'Métrica'
+  myshp@data[myshp@data[["CodigoBito"]] == '3', 'CodigoBito'] <- 'Larga'
+  myshp@data[myshp@data[["CodigoBito"]] == '5', 'CodigoBito'] <- 'Mista'}
+
+
+# Inserção, na coluna de atributos do shapefile, as informações da Declaração de Rede referentes a cada entre pátio da malha
+DR_TU <- read.table("Capacidade_Utilizada_2019.csv",
+                    sep=';', dec=',', header=TRUE)
+DR_TU$AB <- NA
+DR_TU$AB <- paste(DR_TU$A, DR_TU$B, sep=" - ")
+
+
+myshp@data$AB <- NA
+myshp@data$AB <- paste(myshp@data$A,
+                       myshp@data$B, sep=" - ")
+
+myshp@data <- plyr::join(myshp@data,
+                         DR_TU,
+                         by='AB',
+                         match="first")
+
+# Inserindo as informações da Declaração de Rede
+DR_TU <- read.table("Capacidade_Utilizada_2019.csv",
+                    sep=';', dec=',', header=TRUE)
+DR_TU$AB <- NA
+DR_TU$AB <- paste(DR_TU$A, DR_TU$B, sep=" - ")
+
+
+myshp@data$AB <- NA
+myshp@data$AB <- paste(myshp@data$A,
+                       myshp@data$B, sep=" - ")
+
+myshp@data <- plyr::join(myshp@data,
+                         DR_TU,
+                         by='AB',
+                         match="first")
+```
+
+### Da Criação da Interface Gráfica
+Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.
+
+O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R e os pacotes `tmap` e `mapview` ampliaram as possibilidades do `leaflet`.
+
+O pacote mapview possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a atributos da base de dados georreferenciada.
+
+Portanto, foi utilizado o pacote `mapview` para a criação da Interface Gráfica da Declaração de Rede.
+
+``` {r eval = FALSE}
+library(mapview)
+library(leaflet)
+library(RColorBrewer)
+
+red = colorRampPalette(c('green', 'yellow','red'))
+
+myshp@data$dummy <- myshp@data$Utilizada
+myshp@data$dummy <- ifelse(myshp@data$Utilizada > 1, 1, myshp@data$dummy)
+myshp@data$dummy <- ifelse(myshp@data$dummy == 0, NA, myshp@data$dummy)
+
+# Drop das colunas desnecessarias
+myshp@data <- myshp@data[ , !names(myshp@data) %in% c("CodigoLinh", "CodigoLi00",
+                                                      "CodigoEsta", "CodigoBito",
+                                                      "NumeroSequ", "IndicadorC",
+                                                      "IndicadorE", "CodigoLinha",
+                                                      "CodigoEstacao", "CodigoTresC",
+                                                      "CodigoLinh", "CodigoLi00",
+                                                      "CodigoEsta", "CodigoFerr",
+                                                      "CodigoFerrovia", "SiglaFerrovia",
+                                                      "LogotipoFerrovia", "DataExclusao",
+                                                      "IndicadorObrigatorioDesempenhoProducao",
+                                                      "CodigoLinha", "CodigoEstacao",
+                                                      "linesta", "Ferrovia", "Linha",
+                                                      "X", "Ferrovia", "Linha", "A", "B",
+                                                      "x", "CodigoTresLetrasEstacao",
+                                                      "ExtensÃ.o..km.")]
+
+# Alteração do nome das colunas
+colnames(myshp@data)[which(names(myshp@data) == "NumeroQuil")] <- "Marco Quilométrico"
+colnames(myshp@data)[which(names(myshp@data) == "NumeroExte")] <- "Extensão do Entre Pátio (km)"
+colnames(myshp@data)[which(names(myshp@data) == "NomeFerrovia")] <- "Ferrovia"
+colnames(myshp@data)[which(names(myshp@data) == "NomeReduzidoFerrovia")] <- "Sigla-Ferrovia"
+colnames(myshp@data)[which(names(myshp@data) == "NomeLinha")] <- "Linha"
+colnames(myshp@data)[which(names(myshp@data) == "Instalada")] <- "Capacidade Instalada"
+colnames(myshp@data)[which(names(myshp@data) == "Trens")] <- "Capacidade Vinculada"
+colnames(myshp@data)[which(names(myshp@data) == "Utilizada")] <- "Saturação"
+
+m3 <- mapview(myshp, zcol="dummy",
+              legend = TRUE,
+              layer.name = 'Utilização da Capacidade Instalada',
+              color = red)
+
+```
+
+# Considerações Finais
+As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
+
+# <a href='http://www.antt.gov.br/'><img src='C:/Declaração de Rede 2020/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/Declaração de Rede 2020/logo_github.png' align="center" height="60" /></a>
+
+
+
+    
+    
+    
+    
+    
