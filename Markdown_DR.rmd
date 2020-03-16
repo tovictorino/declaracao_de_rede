@@ -65,7 +65,7 @@ myshp@data <- plyr::join(myshp@data,
                   tblLinha,
                   by='CodigoLi00')
 
-# Substituição dos dados da coluna CodigoEstacao pelo código de três letras do nome da estação
+# Substituição dos dados da coluna CodigoEstacao pelo código de três letras da estação
 tblEstacao <- readxl::read_excel("tblEstacao.xlsx")
 tblEstacao$CodigoEsta <- tblEstacao$CodigoEstacao
 myshp@data <- plyr::join(myshp@data,
@@ -85,22 +85,6 @@ myshp@data <- plyr::join(myshp@data,
 
 
 # Inserção, na coluna de atributos do shapefile, as informações da Declaração de Rede referentes a cada entre pátio da malha
-DR_TU <- read.table("Capacidade_Utilizada_2019.csv",
-                    sep=';', dec=',', header=TRUE)
-DR_TU$AB <- NA
-DR_TU$AB <- paste(DR_TU$A, DR_TU$B, sep=" - ")
-
-
-myshp@data$AB <- NA
-myshp@data$AB <- paste(myshp@data$A,
-                       myshp@data$B, sep=" - ")
-
-myshp@data <- plyr::join(myshp@data,
-                         DR_TU,
-                         by='AB',
-                         match="first")
-
-# Inserindo as informações da Declaração de Rede
 DR_TU <- read.table("Capacidade_Utilizada_2019.csv",
                     sep=';', dec=',', header=TRUE)
 DR_TU$AB <- NA
@@ -188,7 +172,7 @@ A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma 
 * a Saturação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
 
 # Considerações Finais
-A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
+A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
 * v-0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020

@@ -419,7 +419,7 @@ myshp@data &lt;- plyr::join(myshp@data,
                   tblLinha,
                   by=&#39;CodigoLi00&#39;)
 
-# Substituição dos dados da coluna CodigoEstacao pelo código de três letras do nome da estação
+# Substituição dos dados da coluna CodigoEstacao pelo código de três letras da estação
 tblEstacao &lt;- readxl::read_excel(&quot;tblEstacao.xlsx&quot;)
 tblEstacao$CodigoEsta &lt;- tblEstacao$CodigoEstacao
 myshp@data &lt;- plyr::join(myshp@data,
@@ -439,22 +439,6 @@ myshp@data &lt;- plyr::join(myshp@data,
 
 
 # Inserção, na coluna de atributos do shapefile, as informações da Declaração de Rede referentes a cada entre pátio da malha
-DR_TU &lt;- read.table(&quot;Capacidade_Utilizada_2019.csv&quot;,
-                    sep=&#39;;&#39;, dec=&#39;,&#39;, header=TRUE)
-DR_TU$AB &lt;- NA
-DR_TU$AB &lt;- paste(DR_TU$A, DR_TU$B, sep=&quot; - &quot;)
-
-
-myshp@data$AB &lt;- NA
-myshp@data$AB &lt;- paste(myshp@data$A,
-                       myshp@data$B, sep=&quot; - &quot;)
-
-myshp@data &lt;- plyr::join(myshp@data,
-                         DR_TU,
-                         by=&#39;AB&#39;,
-                         match=&quot;first&quot;)
-
-# Inserindo as informações da Declaração de Rede
 DR_TU &lt;- read.table(&quot;Capacidade_Utilizada_2019.csv&quot;,
                     sep=&#39;;&#39;, dec=&#39;,&#39;, header=TRUE)
 DR_TU$AB &lt;- NA
@@ -539,7 +523,7 @@ m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
 </div>
 <div id="considerações-finais" class="section level1">
 <h1>Considerações Finais</h1>
-<p>A primeira versão da Interface Gráfica da Declaração de Rede está disponível no <a href="https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html">link</a>. As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
+<p>A primeira versão da Interface Gráfica da Declaração de Rede está disponível no <a href="https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html">link</a>. As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
 <div id="controle-de-versão" class="section level3">
 <h3>Controle de Versão</h3>
 <ul>
