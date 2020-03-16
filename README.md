@@ -1,6 +1,6 @@
 # Declaração de Rede - Interface Gráfica
 
-Versão Atual: v-0.1
+Versão Atual: v-0.1 - 13/03/2020
 
 GitHub oficial da Interface Gráfica da Declaração de Rede Ferroviária da ANTT.
 
