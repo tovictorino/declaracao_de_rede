@@ -1,4 +1,4 @@
-# Declaração de Rede - Interface Gráfica
+# [Declaração de Rede - Interface Gráfica](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html)
 
 Versão Atual: v-0.1 - 13/03/2020
 
