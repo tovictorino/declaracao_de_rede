@@ -4,6 +4,6 @@ Versão Atual: v-0.1 - 13/03/2020
 
 GitHub oficial da Interface Gráfica da Declaração de Rede Ferroviária da ANTT.
 
-Para a documentação da Interface Gráfica, acessar arquivo Markdown_DR.rmd.
+Para a documentação da Interface Gráfica, acessar arquivo Markdown_DR.rmd ou [link](https://declaracaoderedev01.imfast.io/Markdown_DR.html).
 
 Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
