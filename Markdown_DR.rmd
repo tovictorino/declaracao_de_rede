@@ -171,6 +171,17 @@ A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma 
 * a Capacidade Vinculada do trecho entre pátio; e
 * a Saturação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
 
+### Session Information
+```{r someVar, echo=FALSE, message=FALSE, warning=FALSE}
+library(rgdal)
+library(mapview)
+library(leaflet)
+library(RColorBrewer)
+library(dplyr)
+info <- sessionInfo()
+info
+```
+
 # Considerações Finais
 A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
