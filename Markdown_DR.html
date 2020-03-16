@@ -394,17 +394,20 @@ text-align: justify}
 <div id="da-implementação" class="section level1">
 <h1>Da Implementação</h1>
 <p>A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes <code>dplyr</code>, <code>rgdal</code> e <code>mapview</code>.</p>
-<div id="da-manipulação-das-bases-de-dados" class="section level3">
-<h3>Da Manipulação das Bases de Dados</h3>
+<div id="shapefile-e-tabela-de-atributos" class="section level3">
+<h3>Shapefile e Tabela de Atributos</h3>
 <p>Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
-<p>A leitura da base de dados georreferenciada se deu através do pacote <code>rgdal</code>.</p>
+<p>A referida base para representação gráfica do Subsistema Ferroviário Federal é do tipo vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
+<p>A estrutura vetorial de dados é armazenada como um conjunto de arquivos gerando um ESRI Shapefile.</p>
+<p>A leitura do Shapefile se deu através do pacote <code>rgdal</code>.</p>
 <pre class="r"><code>library(rgdal)
 library(dplyr)
 
 # Leitura da base georreferenciadas
 myshp &lt;- readOGR(dsn=path.expand(&quot;SFF_shapefile&quot;),
                  layer=&quot;dbo_tblLinhaEstacao_spatial_linestring&quot;, stringsAsFactors = FALSE)</code></pre>
-<p>A manipulação da base de dados georreferenciada se deu por meio dos pacotes <code>dplyr</code> e <code>plyr</code>.</p>
+<p>Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroiárias, nome das estações que delimitam cada arco (Linestring) e inclusão das demais características das linhas ferroviárias.</p>
+<p>A manipulação da tabela de atributos se deu por meio dos pacotes <code>dplyr</code> e <code>plyr</code> conforme apresentado a seguir.</p>
 <pre class="r"><code># Substituição dos dados da coluna CodigoFERR pelo nome da ferrovia
 tblFerrovia &lt;- readxl::read_excel(&quot;tblFerrovia.xlsx&quot;)
 tblFerrovia$CodigoFerr &lt;- tblFerrovia$CodigoFerrovia

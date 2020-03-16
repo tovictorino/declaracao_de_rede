@@ -34,10 +34,14 @@ O Projeto foi desenvolvido pela equipe da Gerência de Regulação e Outorgas Fe
 # Da Implementação
 A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal` e `mapview`.
 
-### Da Manipulação das Bases de Dados
+### Shapefile e Tabela de Atributos
 Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
 
-A leitura da base de dados georreferenciada se deu através do pacote `rgdal`.
+A referida base para representação gráfica do Subsistema Ferroviário Federal é do tipo vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
+
+A estrutura vetorial de dados é armazenada como um conjunto de arquivos gerando um ESRI Shapefile.
+
+A leitura do Shapefile se deu através do pacote `rgdal`.
 
 ``` {r eval = FALSE}
 library(rgdal)
@@ -48,7 +52,9 @@ myshp <- readOGR(dsn=path.expand("SFF_shapefile"),
                  layer="dbo_tblLinhaEstacao_spatial_linestring", stringsAsFactors = FALSE)
 ```
 
-A manipulação da base de dados georreferenciada se deu por meio dos pacotes `dplyr` e `plyr`.
+Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroiárias, nome das estações que delimitam cada arco (Linestring) e inclusão das demais características das linhas ferroviárias.
+
+A manipulação da tabela de atributos se deu por meio dos pacotes `dplyr` e `plyr` conforme apresentado a seguir.
 
 ``` {r eval = FALSE}
 # Substituição dos dados da coluna CodigoFERR pelo nome da ferrovia
