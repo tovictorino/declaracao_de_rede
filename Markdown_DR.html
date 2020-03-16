@@ -393,7 +393,7 @@ text-align: justify}
 </div>
 <div id="da-implementação" class="section level1">
 <h1>Da Implementação</h1>
-<p>A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes <code>dplyr</code>, <code>rgdal</code> e <code>mapview.</code></p>
+<p>A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes <code>dplyr</code>, <code>rgdal</code> e <code>mapview</code>.</p>
 <div id="da-manipulação-das-bases-de-dados" class="section level3">
 <h3>Da Manipulação das Bases de Dados</h3>
 <p>Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
@@ -468,19 +468,7 @@ myshp@data$AB &lt;- paste(myshp@data$A,
 myshp@data &lt;- plyr::join(myshp@data,
                          DR_TU,
                          by=&#39;AB&#39;,
-                         match=&quot;first&quot;)</code></pre>
-</div>
-<div id="da-criação-da-interface-gráfica" class="section level3">
-<h3>Da Criação da Interface Gráfica</h3>
-<p>Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.</p>
-<p>O lançamento do pacote <code>leaflet</code> em 2015 revolucionou a criação de mapas em formato ‘web’ ao possibilitar sua integração com a linguagem de programação R e os pacotes <code>tmap</code> e <code>mapview</code> ampliaram as possibilidades do <code>leaflet</code>.</p>
-<p>O pacote mapview possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a atributos da base de dados georreferenciada.</p>
-<p>Portanto, foi utilizado o pacote <code>mapview</code> para a criação da Interface Gráfica da Declaração de Rede.</p>
-<pre class="r"><code>library(mapview)
-library(leaflet)
-library(RColorBrewer)
-
-red = colorRampPalette(c(&#39;green&#39;, &#39;yellow&#39;,&#39;red&#39;))
+                         match=&quot;first&quot;)
 
 myshp@data$dummy &lt;- myshp@data$Utilizada
 myshp@data$dummy &lt;- ifelse(myshp@data$Utilizada &gt; 1, 1, myshp@data$dummy)
@@ -511,7 +499,19 @@ colnames(myshp@data)[which(names(myshp@data) == &quot;NomeReduzidoFerrovia&quot;
 colnames(myshp@data)[which(names(myshp@data) == &quot;NomeLinha&quot;)] &lt;- &quot;Linha&quot;
 colnames(myshp@data)[which(names(myshp@data) == &quot;Instalada&quot;)] &lt;- &quot;Capacidade Instalada&quot;
 colnames(myshp@data)[which(names(myshp@data) == &quot;Trens&quot;)] &lt;- &quot;Capacidade Vinculada&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;Utilizada&quot;)] &lt;- &quot;Saturação&quot;
+colnames(myshp@data)[which(names(myshp@data) == &quot;Utilizada&quot;)] &lt;- &quot;Saturação&quot;</code></pre>
+</div>
+<div id="da-criação-da-interface-gráfica" class="section level3">
+<h3>Da Criação da Interface Gráfica</h3>
+<p>Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.</p>
+<p>O lançamento do pacote <code>leaflet</code> em 2015 revolucionou a criação de mapas em formato ‘web’ ao possibilitar sua integração com a linguagem de programação R e os pacotes <code>tmap</code> e <code>mapview</code> ampliaram as possibilidades do <code>leaflet</code>.</p>
+<p>O pacote <code>mapview</code> possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a elementos da base de dados georreferenciada.</p>
+<p>Portanto, foi utilizado o pacote <code>mapview</code> para a criação da Interface Gráfica da Declaração de Rede.</p>
+<pre class="r"><code>library(mapview)
+library(leaflet)
+library(RColorBrewer)
+
+red = colorRampPalette(c(&#39;green&#39;, &#39;yellow&#39;,&#39;red&#39;))
 
 m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
               legend = TRUE,
@@ -520,7 +520,7 @@ m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
 </div>
 <div id="dos-dados-apresentados" class="section level3">
 <h3>Dos Dados Apresentados</h3>
-<p>A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderede4.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
+<p>A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
 <ul>
 <li>o marco quilométrico de início do trecho entre pátio;</li>
 <li>a extensão, em km, do trecho entre pátio;</li>
@@ -539,11 +539,11 @@ m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
 </div>
 <div id="considerações-finais" class="section level1">
 <h1>Considerações Finais</h1>
-<p>A primeira versão da Interface Gráfica da Declaração de Rede está disponível no <a href="https://declaracaoderede4.imfast.io/DR_Interface_Grafica.html">link</a>. As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
+<p>A primeira versão da Interface Gráfica da Declaração de Rede está disponível no <a href="https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html">link</a>. As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
 <div id="controle-de-versão" class="section level3">
 <h3>Controle de Versão</h3>
 <ul>
-<li>Versão 0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020</li>
+<li>v-0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020</li>
 </ul>
 </div>
 </div>

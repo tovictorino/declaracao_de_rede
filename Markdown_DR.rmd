@@ -32,7 +32,7 @@ O Projeto foi desenvolvido pela equipe da Gerência de Regulação e Outorgas Fe
 * Thiago Victorino - Líder do Projeto - thiago.victorino@antt.gov.br
 
 # Da Implementação
-A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal` e `mapview.`
+A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal` e `mapview`.
 
 ### Da Manipulação das Bases de Dados
 Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
@@ -115,23 +115,6 @@ myshp@data <- plyr::join(myshp@data,
                          DR_TU,
                          by='AB',
                          match="first")
-```
-
-### Da Criação da Interface Gráfica
-Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.
-
-O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R e os pacotes `tmap` e `mapview` ampliaram as possibilidades do `leaflet`.
-
-O pacote mapview possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a atributos da base de dados georreferenciada.
-
-Portanto, foi utilizado o pacote `mapview` para a criação da Interface Gráfica da Declaração de Rede.
-
-``` {r eval = FALSE}
-library(mapview)
-library(leaflet)
-library(RColorBrewer)
-
-red = colorRampPalette(c('green', 'yellow','red'))
 
 myshp@data$dummy <- myshp@data$Utilizada
 myshp@data$dummy <- ifelse(myshp@data$Utilizada > 1, 1, myshp@data$dummy)
@@ -163,6 +146,23 @@ colnames(myshp@data)[which(names(myshp@data) == "NomeLinha")] <- "Linha"
 colnames(myshp@data)[which(names(myshp@data) == "Instalada")] <- "Capacidade Instalada"
 colnames(myshp@data)[which(names(myshp@data) == "Trens")] <- "Capacidade Vinculada"
 colnames(myshp@data)[which(names(myshp@data) == "Utilizada")] <- "Saturação"
+```
+
+### Da Criação da Interface Gráfica
+Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.
+
+O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R e os pacotes `tmap` e `mapview` ampliaram as possibilidades do `leaflet`.
+
+O pacote `mapview` possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a elementos da base de dados georreferenciada.
+
+Portanto, foi utilizado o pacote `mapview` para a criação da Interface Gráfica da Declaração de Rede.
+
+``` {r eval = FALSE}
+library(mapview)
+library(leaflet)
+library(RColorBrewer)
+
+red = colorRampPalette(c('green', 'yellow','red'))
 
 m3 <- mapview(myshp, zcol="dummy",
               legend = TRUE,
@@ -172,7 +172,7 @@ m3 <- mapview(myshp, zcol="dummy",
 ```
 
 ### Dos Dados Apresentados
-A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderede4.imfast.io/DR_Interface_Grafica.html):
+A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html):
 
 * o marco quilométrico de início do trecho entre pátio;
 * a extensão, em km, do trecho entre pátio;
@@ -188,12 +188,12 @@ A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma 
 * a Saturação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
 
 # Considerações Finais
-A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderede4.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
+A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
-* Versão 0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
+* v-0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
 
-# <a href='http://www.antt.gov.br/'><img src='C:/Declaração de Rede 2020/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/Declaração de Rede 2020/logo_github.png' align="center" height="60" /></a>
+# <a href='http://www.antt.gov.br/'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/GitHub-Mark-120px-plus.png' align="center" height="60" /></a>
 
 
 

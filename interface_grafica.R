@@ -97,6 +97,11 @@ colnames(myshp@data)[which(names(myshp@data) == "Instalada")] <- "Capacidade Ins
 colnames(myshp@data)[which(names(myshp@data) == "Trens")] <- "Capacidade Vinculada"
 colnames(myshp@data)[which(names(myshp@data) == "Utilizada")] <- "Saturação"
 
+myshp@data$`Capacidade Instalada` <- round(myshp@data$`Capacidade Instalada`, digits=2)
+myshp@data$`Capacidade Vinculada` <- round(myshp@data$`Capacidade Vinculada`, digits=2)
+myshp@data$Saturação <- round(myshp@data$Saturação, digits=2)
+myshp@data$dummy <- round(myshp@data$dummy, digits=2)
+
 m3 <- mapview(myshp, zcol="dummy",
               legend = TRUE,
               layer.name = 'Utilização da Capacidade Instalada',
