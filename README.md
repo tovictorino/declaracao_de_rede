@@ -1,6 +1,8 @@
 # Declaração de Rede - Interface Gráfica
 
-Versão Atual: [v-0.2](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html) - 18/03/2020
+Versão Atual:
+
+[v-0.2](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html) - 18/03/2020
 
 Versões anteriores:
 
