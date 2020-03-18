@@ -189,10 +189,12 @@ info
 ```
 
 # Considerações Finais
-A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
+A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
-* v-0.1 - Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
+[v-0.2](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html): Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
+
+[v-0.1](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html): Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
 
 # <a href='http://www.antt.gov.br/'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/GitHub-Mark-120px-plus.png' align="center" height="60" /></a>
 
