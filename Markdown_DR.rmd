@@ -192,6 +192,9 @@ info
 A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
+
+[v-0.3](https://declaracaoderedev03.imfast.io/DR_Interface_Grafica.html): Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
+
 [v-0.2](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html): Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
 
 [v-0.1](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html): Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020

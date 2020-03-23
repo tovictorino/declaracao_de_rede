@@ -4,7 +4,6 @@ library(leaflet)
 library(RColorBrewer)
 library(dplyr)
 
-
 ####################### AJUSTE DAS CAMADAS DO SHAPEFILE #######################
 
 # Leitura das bases georreferenciadas
@@ -108,9 +107,6 @@ m3 <- mapview(myshp, zcol="dummy",
               color = red)
 
 mapshot(m3, url = "DR_Interface_Grafica.html", selfcontained = FALSE)
-
-
-
 
 
 
