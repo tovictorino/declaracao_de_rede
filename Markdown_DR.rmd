@@ -189,7 +189,7 @@ info
 ```
 
 # Considerações Finais
-A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
+A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede). Consulte o Readme.md para saber como contribuir.
 
 ### Controle de Versão
 
