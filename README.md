@@ -2,7 +2,7 @@
 
 Versão Atual:
 
-[v-0.3](https://declaracaoderedev031.imfast.io/DR_Interface_Grafica.html) - 23/03/2020
+[v-0.3](https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html) - 23/03/2020
 
 Versões anteriores:
 
