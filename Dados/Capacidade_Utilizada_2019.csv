@@ -115,9 +115,9 @@
 113;FCA;Eng. Bhering - Divinópolis;ECM;EGF;13,168;;ECM - EGF;9,29584;0;0
 114;FCA;Eng. Bhering - Divinópolis;EGF;EWD;26,965;;EGF - EWD;4,40551;0;0
 115;FCA;Eng. Bhering - Divinópolis;EWD;EDV;11,177;;EWD - EDV;12,70978;0;0
-116;FCA;General Carneiro - Monte Azul;EGC;VWI;3;;EGC - VWI;0;0;0
-117;FCA;General Carneiro - Monte Azul;VWI;ECE;6,532;;VWI - ECE;0;0;0
-118;FCA;General Carneiro - Monte Azul;ECE;ECA;6,532;;ECE - ECA;0;0;0
+116;FCA;General Carneiro - Monte Azul;EGC;VWI;3;;EGC - VWI;43,93413453;6,699095554;0,152480426
+117;FCA;General Carneiro - Monte Azul;VWI;ECE;6,532;;VWI - ECE;13,99616;8,188614529;0,585061512
+118;FCA;General Carneiro - Monte Azul;ECE;ECA;6,532;;ECE - ECA;23,26308256;8,188614529;0,352000407
 119;FCA;General Carneiro - Monte Azul;ECA;ERE;12,981;;ECA - ERE;21,95417;3,91;0,178098284
 120;FCA;General Carneiro - Monte Azul;ERE;EVP;6,292;;ERE - EVP;19,8596;3,91;0,196882112
 121;FCA;General Carneiro - Monte Azul;EVP;ENG;5,148;;EVP - ENG;25,86806;3,9;0,150765075
@@ -353,10 +353,10 @@
 351;FCA;Araguari - Roncador Novo;EVV;EPO;19,22;;EVV - EPO;11,64902;0,75;0,064383098
 352;FCA;Araguari - Roncador Novo;EPO;ENJ;13,08;;EPO - ENJ;19,36687;0,75;0,038725927
 353;FCA;Araguari - Roncador Novo;ENJ;EPZ;33,267;;ENJ - EPZ;8,30827;0,75;0,090271501
-354;FCA;Calafate - General Carneiro;ECL;EBH;5;;ECL - EBH;0;0;0
-355;FCA;Calafate - General Carneiro;EBH;EHF;5;;EBH - EHF;0;0;0
-356;FCA;Calafate - General Carneiro;EHF;OCR;7;;EHF - OCR;0;0;0
-357;FCA;Calafate - General Carneiro;OCR;EGC;2;;OCR - EGC;0;0;0
+354;FCA;Calafate - General Carneiro;ECL;EBH;5;;ECL - EBH;33,96533128;6,70;0,197233335
+355;FCA;Calafate - General Carneiro;EBH;EHF;5;;EBH - EHF;47,26855655;6,70;0,141724141
+356;FCA;Calafate - General Carneiro;EHF;OCR;7;;EHF - OCR;21,28778606;6,70;0,31469198
+357;FCA;Calafate - General Carneiro;OCR;EGC;2;;OCR - EGC;21,28778606;6,70;0,31469198
 358;FCA;Ramal de Pirapora;ECO;ECW;22,849;;ECO - ECW;15,7607;0,43;0,027283052
 359;FCA;Ramal de Pirapora;ECW;E20;19,268;;ECW - E20;5,12112;0,43;0,083966007
 360;FCA;Ramal de Pirapora;E20;ELA;24,7;;E20 - ELA;2,08952;0,43;0,205788889
