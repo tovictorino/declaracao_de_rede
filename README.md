@@ -11,7 +11,7 @@ Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
 3. Commit suas mudanças;
 4. Faça um Pull Request e detalhe as alterações propostas.
 
-Versão Atual:
+### Versão Atual:
 
 [v-0.3](https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html) - 23/03/2020
 
