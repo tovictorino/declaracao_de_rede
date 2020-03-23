@@ -7,9 +7,10 @@ Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
 ### Orientações para Contribuições
 
 1. Faça fork do projeto;
-2. Proponha as alterações;
-3. Commit suas mudanças;
-4. Faça um Pull Request e detalhe as alterações propostas.
+2. Crie um Branch: `git checkout -b nome_do_seu_branch`;
+3. Commit suas mudanças: `git commit -m 'Descrição do commit'`
+4. Push para o Branch: `git push origin nome_do_seu_branch`
+5. Faça um Pull Request e detalhe as alterações propostas.
 
 ### Versão Atual:
 
