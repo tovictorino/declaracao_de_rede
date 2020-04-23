@@ -32,110 +32,123 @@ O Projeto foi desenvolvido pela equipe da Gerência de Regulação e Outorgas Fe
 * Thiago Victorino - Líder do Projeto - thiago.victorino@antt.gov.br
 
 # Da Implementação
-A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal` e `mapview`.
+A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal`, `mapview`, `leaflet` e `leaflet.extras`.
 
 ### Shapefile e Tabela de Atributos
-Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
+Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
 
-A referida base para representação gráfica do Subsistema Ferroviário Federal é do tipo vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
+O shapefile é do tipo ESRI vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
 
-A estrutura vetorial de dados é armazenada como um conjunto de arquivos gerando um ESRI Shapefile.
-
-A leitura do Shapefile se deu através do pacote `rgdal`.
+A leitura do Shapefile se deu por meio do pacote `rgdal`.
 
 ``` {r eval = FALSE}
 library(rgdal)
-library(dplyr)
 
 # Leitura da base georreferenciadas
+## myshp é um shapefile do tipo linestring das linhas do SFF. 
+## myshp2 é um shapefile do tipo point das estações cadastradas na Declaração de Rede
 myshp <- readOGR(dsn=path.expand("SFF_shapefile"),
                  layer="dbo_tblLinhaEstacao_spatial_linestring", stringsAsFactors = FALSE)
+myshp2 <- readOGR(dsn=path.expand("shp_atualizado"),
+                  layer="dbo_tblEstacao_spatial_point", stringsAsFactors = FALSE, encoding = "UTF-8")
 ```
 
-Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroiárias, nome das estações que delimitam cada arco (Linestring) e inclusão das demais características das linhas ferroviárias.
+Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroviárias, nome das estações que delimitam cada elemento Linestring e foram incluídas as demais características pertinentes à interface gráfica.
 
 A manipulação da tabela de atributos se deu por meio dos pacotes `dplyr` e `plyr` conforme apresentado a seguir.
 
 ``` {r eval = FALSE}
-# Substituição dos dados da coluna CodigoFERR pelo nome da ferrovia
-tblFerrovia <- readxl::read_excel("tblFerrovia.xlsx")
+library(dplyr)
+
+# Substituição do CodigoFerr, antes numérico, agora string, com o nome das estações cadastradas na DR
+tblFerrovia <- readxl::read_excel("Dados/tblFerrovia.xlsx")
 tblFerrovia$CodigoFerr <- tblFerrovia$CodigoFerrovia
 myshp@data <- plyr::join(myshp@data,
                          tblFerrovia,
                          by='CodigoFerr')
+myshp2@data <- plyr::join(myshp2@data,
+                          tblFerrovia,
+                          by='CodigoFerr')
 
-# Substituição dos dados da coluna CodigoLi00 pelo nome da linha
-tblLinha <- readxl::read_excel("tblLinha.xlsx")
+# Substituição do CodigoLi00, antes numérico, agora string, com o nome das linhas cadastradas na DR
+tblLinha <- readxl::read_excel("Dados/tblLinha.xlsx")
 tblLinha$CodigoLi00 <- tblLinha$CodigoLinha
 myshp@data <- plyr::join(myshp@data,
-                  tblLinha,
-                  by='CodigoLi00')
+                         tblLinha,
+                         by='CodigoLi00')
 
-# Substituição dos dados da coluna CodigoEstacao pelo código de três letras da estação
-tblEstacao <- readxl::read_excel("tblEstacao.xlsx")
+# Substituição do CodigoEsta, antes numérico, agora string, com o código de tres letras
+tblEstacao <- readxl::read_excel("Dados/tblEstacao.xlsx")
 tblEstacao$CodigoEsta <- tblEstacao$CodigoEstacao
 myshp@data <- plyr::join(myshp@data,
                          tblEstacao,
                          by='CodigoEsta')
-DR_2020 <- readxl::read_excel("dr2020_original.xlsx")
+
+# Merge da tabela de atributos do shapefile com a Declaração de Rede 2020
+DR_2020 <- readxl::read_excel("Dados/dr2020_original.xlsx")
 DR_2020$linesta <- paste(DR_2020$Linha, DR_2020$B, sep='!')
 myshp@data$linesta <- paste(myshp@data$NomeLinha, myshp@data$CodigoTresLetrasEstacao, sep='!')
 myshp@data <- plyr::join(myshp@data,
                          DR_2020,
                          by='linesta')
 
-# Substituição dos dados da coluna CodigoBito pela sua classificação real
-{myshp@data[myshp@data[["CodigoBito"]] == '1', 'CodigoBito'] <- 'Métrica'
-  myshp@data[myshp@data[["CodigoBito"]] == '3', 'CodigoBito'] <- 'Larga'
-  myshp@data[myshp@data[["CodigoBito"]] == '5', 'CodigoBito'] <- 'Mista'}
+# Ajustes à tabela de atributos do shapefile: drop de colunas desnecessárias e 
+# alteração dos nomes das variáveis
+myshp2@data <- select(myshp2@data, -c(CodigoEsta, CodigoFerr, CodigoMuni, DataExclus,
+                                      IndicadorP, CodigoPort, CodigoEsca, CodigoEsca,
+                                      CodigoArqu, IndicadorT, IndicadorF,LogotipoFerrovia,
+                                      DataExclusao, IndicadorObrigatorioDesempenhoProducao))
 
+myshp2@data <- rename(myshp2@data, "Nome Estação" = NomeEstaca)
+myshp2@data <- rename(myshp2@data, "Código Estação" = CodigoTres)
+myshp2@data <- rename(myshp2@data, "Ferrovia" = NomeFerrovia)
 
-# Inserção, na coluna de atributos do shapefile, as informações da Declaração de Rede referentes a cada entre pátio da malha
-DR_TU <- read.table("Capacidade_Utilizada_2019.csv",
-                    sep=';', dec=',', header=TRUE)
-DR_TU$AB <- NA
-DR_TU$AB <- paste(DR_TU$A, DR_TU$B, sep=" - ")
-
-
-myshp@data$AB <- NA
-myshp@data$AB <- paste(myshp@data$A,
-                       myshp@data$B, sep=" - ")
-
+## Composição do nome completo das estações: Nome da Estação (Código de Três Letras)
+df_estac <- tibble(myshp2@data$`Código Estação`, myshp2@data$`Nome Estação`)
+colnames(df_estac) <- c('A','NomeA')
 myshp@data <- plyr::join(myshp@data,
-                         DR_TU,
-                         by='AB',
-                         match="first")
+                         df_estac,
+                         by='A')
+colnames(df_estac) <- c('B','NomeB')
+myshp@data <- plyr::join(myshp@data,
+                         df_estac,
+                         by='B')
 
-myshp@data$dummy <- myshp@data$Utilizada
-myshp@data$dummy <- ifelse(myshp@data$Utilizada > 1, 1, myshp@data$dummy)
-myshp@data$dummy <- ifelse(myshp@data$dummy == 0, NA, myshp@data$dummy)
+myshp@data$`Nome Estação A` <- paste(myshp@data$NomeA, " (", myshp@data$A,")", sep="")
+myshp@data$`Nome Estação B` <- paste(myshp@data$NomeB, " (", myshp@data$B,")", sep="")
+myshp2@data$`Código Estação` <- paste(myshp2@data$`Nome Estação`, " (", myshp2@data$`Código Estação`,")", sep="")
 
-# Drop das colunas desnecessarias
-myshp@data <- myshp@data[ , !names(myshp@data) %in% c("CodigoLinh", "CodigoLi00",
-                                                      "CodigoEsta", "CodigoBito",
-                                                      "NumeroSequ", "IndicadorC",
-                                                      "IndicadorE", "CodigoLinha",
-                                                      "CodigoEstacao", "CodigoTresC",
-                                                      "CodigoLinh", "CodigoLi00",
-                                                      "CodigoEsta", "CodigoFerr",
-                                                      "CodigoFerrovia", "SiglaFerrovia",
-                                                      "LogotipoFerrovia", "DataExclusao",
-                                                      "IndicadorObrigatorioDesempenhoProducao",
-                                                      "CodigoLinha", "CodigoEstacao",
-                                                      "linesta", "Ferrovia", "Linha",
-                                                      "X", "Ferrovia", "Linha", "A", "B",
-                                                      "x", "CodigoTresLetrasEstacao",
-                                                      "ExtensÃ.o..km.")]
+myshp@data <- select(myshp@data, -c(B, A, linesta, CodigoEsta, CodigoLi00, CodigoFerr,
+                                    CodigoLinh, NumeroSequ, IndicadorC, IndicadorE,
+                                    NomeReduzidoFerrovia, LogotipoFerrovia, DataExclusao,
+                                    IndicadorObrigatorioDesempenhoProducao, CodigoTresLetrasEstacao,
+                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB, "Nome Estação A",
+                                    "Nome Estação B"))
 
-# Alteração do nome das colunas
-colnames(myshp@data)[which(names(myshp@data) == "NumeroQuil")] <- "Marco Quilométrico"
-colnames(myshp@data)[which(names(myshp@data) == "NumeroExte")] <- "Extensão do Entre Pátio (km)"
-colnames(myshp@data)[which(names(myshp@data) == "NomeFerrovia")] <- "Ferrovia"
-colnames(myshp@data)[which(names(myshp@data) == "NomeReduzidoFerrovia")] <- "Sigla-Ferrovia"
-colnames(myshp@data)[which(names(myshp@data) == "NomeLinha")] <- "Linha"
-colnames(myshp@data)[which(names(myshp@data) == "Instalada")] <- "Capacidade Instalada"
-colnames(myshp@data)[which(names(myshp@data) == "Trens")] <- "Capacidade Vinculada"
-colnames(myshp@data)[which(names(myshp@data) == "Utilizada")] <- "Saturação"
+myshp@data <- rename(myshp@data, "Marco Quilométrico" = NumeroQuil)
+myshp@data <- rename(myshp@data, "Extensão do Entre Pátio (km)" = NumeroExte)
+myshp@data <- rename(myshp@data, "Ferrovia" = NomeFerrovia)
+myshp@data <- rename(myshp@data, "Sigla - Ferrovia" = SiglaFerrovia)
+
+# Cálculo da Ocupação da Capacidade Instalada
+myshp@data$OcupaçãoCrescente <- myshp@data$`Vinculada Crescente`/myshp@data$`Instalada Crescente`
+myshp@data$OcupaçãoCrescente[is.na(myshp@data$OcupaçãoCrescente)] <- 0
+myshp@data$OcupaçãoDecrescente <- myshp@data$`Vinculada Decrescente`/myshp@data$`Instalada Decrescente`
+myshp@data$OcupaçãoDecrescente[is.na(myshp@data$OcupaçãoDecrescente)] <- 0
+
+# Criação da Coluna Ocupação, com o maior valor percentual dentre as colunas OcupaçãoCrescente e OcupaçãoDecrescente
+l <- vector("list", length(myshp@data$OcupaçãoDecrescente))
+for (i in c(1:length(myshp@data$OcupaçãoDecrescente))){
+  l[[i]] = max(myshp@data[i,c("OcupaçãoCrescente", "OcupaçãoDecrescente")], na.rm=TRUE)
+}
+l <- lapply(l, FUN = function(x) ifelse(is.nan(x),NA,x))
+l <- lapply(l, FUN = function(x) ifelse(is.infinite(x),NA,x))
+myshp@data$Ocupação <- unlist(l)
+myshp@data$Ocupação[myshp@data$Ocupação == 0] <- NA
+myshp@data$Ocupação <- round(myshp@data$Ocupação, digits=2)
+
+myshp@data <- myshp@data %>%
+  select("Ferrovia", "Sigla - Ferrovia", "Nome Estação A", "Nome Estação B", everything())
 ```
 
 ### Da Criação da Interface Gráfica
@@ -143,61 +156,83 @@ Como vetor de condução do projeto, a proposta inicial era a criação de uma i
 
 O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R e os pacotes `tmap` e `mapview` ampliaram as possibilidades do `leaflet`.
 
-O pacote `mapview` possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a elementos da base de dados georreferenciada.
-
-Portanto, foi utilizado o pacote `mapview` para a criação da Interface Gráfica da Declaração de Rede.
+Com sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, o pacote uutilizado para a construção da Interface Gráfica da Declaração de Rede foi o `mapview`.
 
 ``` {r eval = FALSE}
 library(mapview)
-library(leaflet)
+library(leaflet.extras)
 library(RColorBrewer)
 
+# Construção da paleta de cores a ser usada no mapa para representação da Ocupação
 red = colorRampPalette(c('green', 'yellow','red'))
 
-m3 <- mapview(myshp, zcol="dummy",
-              legend = TRUE,
-              layer.name = 'Utilização da Capacidade Instalada',
-              color = red)
+# Logo ANTT
+img <- "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Logo_ANTT.svg/1200px-Logo_ANTT.svg.png"
 
+# Criação do mapa
+mapa <- mapview(myshp, zcol="Ocupação",
+                legend = TRUE,
+                layer.name = '',
+                color = red) %>% 
+  
+  leafem::addLogo(img, width = 120, height = 60, url = "http://www.antt.gov.br/", position="topleft") %>%
+  
+  addControl("Pesquisa de Estações",
+             position = "topleft") %>%
+  
+  addCircleMarkers(data = myshp2, lng = myshp2@coords[,1],
+                   lat=myshp2@coords[,2],
+                   popup = ~`Código Estação`,
+                   label=~`Código Estação`,
+                   group='Código Estação') %>%
+  
+  addSearchFeatures(targetGroups = 'Código Estação',
+                    options = searchFeaturesOptions(
+                      zoom=12, openPopup = TRUE, firstTipSubmit = TRUE,
+                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %>%
+  
+  hideGroup('Código Estação')
 ```
 
 ### Dos Dados Apresentados
-A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html):
+A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html):
 
 * o marco quilométrico de início do trecho entre pátio;
 * a extensão, em km, do trecho entre pátio;
 * a Ferrovia e sua abreviação a quem o trecho entre pátio está concedido;
-* o nome da Linha a qual pertence o trecho entre pátio;
 * o ano de referência;
+* o nome da Linha a qual pertence o trecho entre pátio;
 * a bitola do trecho entre pátio;
 * o nº de linhas (singela ou dupla) do trecho entre pátio;
 * o sentido de tráfego do trecho entre pátio;
 * o sistema de sinalização do trecho entre pátio;
 * a Capacidade Instalada do trecho entre pátio;
 * a Capacidade Vinculada do trecho entre pátio; e
-* a Saturação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
+* a Ocupação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
 
 ### Session Information
 ```{r someVar, echo=FALSE, message=FALSE, warning=FALSE}
-library(rgdal)
-library(mapview)
 library(leaflet)
-library(RColorBrewer)
+library(mapview)
+library(leaflet.extras)
+library(rgdal)
 library(dplyr)
+library(RColorBrewer)
 info <- sessionInfo()
 info
 ```
 
 # Considerações Finais
-A primeira versão da Interface Gráfica da Declaração de Rede está disponível no [link](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html). As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede). Consulte o Readme.md para saber como contribuir.
+As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
+[v-0.4](https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html): Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
 
 [v-0.3](https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html): Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
 
-[v-0.2](https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html): Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
+v-0.2: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
 
-[v-0.1](https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html): Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
+v-0.1: Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
 
 # <a href='http://www.antt.gov.br/'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/GitHub-Mark-120px-plus.png' align="center" height="60" /></a>
 

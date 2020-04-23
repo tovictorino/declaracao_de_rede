@@ -393,141 +393,177 @@ text-align: justify}
 </div>
 <div id="da-implementação" class="section level1">
 <h1>Da Implementação</h1>
-<p>A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes <code>dplyr</code>, <code>rgdal</code> e <code>mapview</code>.</p>
+<p>A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes <code>dplyr</code>, <code>rgdal</code>, <code>mapview</code>, <code>leaflet</code> e <code>leaflet.extras</code>.</p>
 <div id="shapefile-e-tabela-de-atributos" class="section level3">
 <h3>Shapefile e Tabela de Atributos</h3>
-<p>Como base para todo o desenvolvimento da interface, foi utilizada a base de dados georreferenciada da Declaração de Rede 2020, construída e atualizada com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
-<p>A referida base para representação gráfica do Subsistema Ferroviário Federal é do tipo vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
-<p>A estrutura vetorial de dados é armazenada como um conjunto de arquivos gerando um ESRI Shapefile.</p>
-<p>A leitura do Shapefile se deu através do pacote <code>rgdal</code>.</p>
+<p>Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
+<p>O shapefile é do tipo ESRI vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
+<p>A leitura do Shapefile se deu por meio do pacote <code>rgdal</code>.</p>
 <pre class="r"><code>library(rgdal)
-library(dplyr)
 
 # Leitura da base georreferenciadas
+## myshp é um shapefile do tipo linestring das linhas do SFF. 
+## myshp2 é um shapefile do tipo point das estações cadastradas na Declaração de Rede
 myshp &lt;- readOGR(dsn=path.expand(&quot;SFF_shapefile&quot;),
-                 layer=&quot;dbo_tblLinhaEstacao_spatial_linestring&quot;, stringsAsFactors = FALSE)</code></pre>
-<p>Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroiárias, nome das estações que delimitam cada arco (Linestring) e inclusão das demais características das linhas ferroviárias.</p>
+                 layer=&quot;dbo_tblLinhaEstacao_spatial_linestring&quot;, stringsAsFactors = FALSE)
+myshp2 &lt;- readOGR(dsn=path.expand(&quot;shp_atualizado&quot;),
+                  layer=&quot;dbo_tblEstacao_spatial_point&quot;, stringsAsFactors = FALSE, encoding = &quot;UTF-8&quot;)</code></pre>
+<p>Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroviárias, nome das estações que delimitam cada elemento Linestring e foram incluídas as demais características pertinentes à interface gráfica.</p>
 <p>A manipulação da tabela de atributos se deu por meio dos pacotes <code>dplyr</code> e <code>plyr</code> conforme apresentado a seguir.</p>
-<pre class="r"><code># Substituição dos dados da coluna CodigoFERR pelo nome da ferrovia
-tblFerrovia &lt;- readxl::read_excel(&quot;tblFerrovia.xlsx&quot;)
+<pre class="r"><code>library(dplyr)
+
+# Substituição do CodigoFerr, antes numérico, agora string, com o nome das estações cadastradas na DR
+tblFerrovia &lt;- readxl::read_excel(&quot;Dados/tblFerrovia.xlsx&quot;)
 tblFerrovia$CodigoFerr &lt;- tblFerrovia$CodigoFerrovia
 myshp@data &lt;- plyr::join(myshp@data,
                          tblFerrovia,
                          by=&#39;CodigoFerr&#39;)
+myshp2@data &lt;- plyr::join(myshp2@data,
+                          tblFerrovia,
+                          by=&#39;CodigoFerr&#39;)
 
-# Substituição dos dados da coluna CodigoLi00 pelo nome da linha
-tblLinha &lt;- readxl::read_excel(&quot;tblLinha.xlsx&quot;)
+# Substituição do CodigoLi00, antes numérico, agora string, com o nome das linhas cadastradas na DR
+tblLinha &lt;- readxl::read_excel(&quot;Dados/tblLinha.xlsx&quot;)
 tblLinha$CodigoLi00 &lt;- tblLinha$CodigoLinha
 myshp@data &lt;- plyr::join(myshp@data,
-                  tblLinha,
-                  by=&#39;CodigoLi00&#39;)
+                         tblLinha,
+                         by=&#39;CodigoLi00&#39;)
 
-# Substituição dos dados da coluna CodigoEstacao pelo código de três letras da estação
-tblEstacao &lt;- readxl::read_excel(&quot;tblEstacao.xlsx&quot;)
+# Substituição do CodigoEsta, antes numérico, agora string, com o código de tres letras
+tblEstacao &lt;- readxl::read_excel(&quot;Dados/tblEstacao.xlsx&quot;)
 tblEstacao$CodigoEsta &lt;- tblEstacao$CodigoEstacao
 myshp@data &lt;- plyr::join(myshp@data,
                          tblEstacao,
                          by=&#39;CodigoEsta&#39;)
-DR_2020 &lt;- readxl::read_excel(&quot;dr2020_original.xlsx&quot;)
+
+# Merge da tabela de atributos do shapefile com a Declaração de Rede 2020
+DR_2020 &lt;- readxl::read_excel(&quot;Dados/dr2020_original.xlsx&quot;)
 DR_2020$linesta &lt;- paste(DR_2020$Linha, DR_2020$B, sep=&#39;!&#39;)
 myshp@data$linesta &lt;- paste(myshp@data$NomeLinha, myshp@data$CodigoTresLetrasEstacao, sep=&#39;!&#39;)
 myshp@data &lt;- plyr::join(myshp@data,
                          DR_2020,
                          by=&#39;linesta&#39;)
 
-# Substituição dos dados da coluna CodigoBito pela sua classificação real
-{myshp@data[myshp@data[[&quot;CodigoBito&quot;]] == &#39;1&#39;, &#39;CodigoBito&#39;] &lt;- &#39;Métrica&#39;
-  myshp@data[myshp@data[[&quot;CodigoBito&quot;]] == &#39;3&#39;, &#39;CodigoBito&#39;] &lt;- &#39;Larga&#39;
-  myshp@data[myshp@data[[&quot;CodigoBito&quot;]] == &#39;5&#39;, &#39;CodigoBito&#39;] &lt;- &#39;Mista&#39;}
+# Ajustes à tabela de atributos do shapefile: drop de colunas desnecessárias e 
+# alteração dos nomes das variáveis
+myshp2@data &lt;- select(myshp2@data, -c(CodigoEsta, CodigoFerr, CodigoMuni, DataExclus,
+                                      IndicadorP, CodigoPort, CodigoEsca, CodigoEsca,
+                                      CodigoArqu, IndicadorT, IndicadorF,LogotipoFerrovia,
+                                      DataExclusao, IndicadorObrigatorioDesempenhoProducao))
 
+myshp2@data &lt;- rename(myshp2@data, &quot;Nome Estação&quot; = NomeEstaca)
+myshp2@data &lt;- rename(myshp2@data, &quot;Código Estação&quot; = CodigoTres)
+myshp2@data &lt;- rename(myshp2@data, &quot;Ferrovia&quot; = NomeFerrovia)
 
-# Inserção, na coluna de atributos do shapefile, as informações da Declaração de Rede referentes a cada entre pátio da malha
-DR_TU &lt;- read.table(&quot;Capacidade_Utilizada_2019.csv&quot;,
-                    sep=&#39;;&#39;, dec=&#39;,&#39;, header=TRUE)
-DR_TU$AB &lt;- NA
-DR_TU$AB &lt;- paste(DR_TU$A, DR_TU$B, sep=&quot; - &quot;)
-
-
-myshp@data$AB &lt;- NA
-myshp@data$AB &lt;- paste(myshp@data$A,
-                       myshp@data$B, sep=&quot; - &quot;)
-
+## Composição do nome completo das estações: Nome da Estação (Código de Três Letras)
+df_estac &lt;- tibble(myshp2@data$`Código Estação`, myshp2@data$`Nome Estação`)
+colnames(df_estac) &lt;- c(&#39;A&#39;,&#39;NomeA&#39;)
 myshp@data &lt;- plyr::join(myshp@data,
-                         DR_TU,
-                         by=&#39;AB&#39;,
-                         match=&quot;first&quot;)
+                         df_estac,
+                         by=&#39;A&#39;)
+colnames(df_estac) &lt;- c(&#39;B&#39;,&#39;NomeB&#39;)
+myshp@data &lt;- plyr::join(myshp@data,
+                         df_estac,
+                         by=&#39;B&#39;)
 
-myshp@data$dummy &lt;- myshp@data$Utilizada
-myshp@data$dummy &lt;- ifelse(myshp@data$Utilizada &gt; 1, 1, myshp@data$dummy)
-myshp@data$dummy &lt;- ifelse(myshp@data$dummy == 0, NA, myshp@data$dummy)
+myshp@data$`Nome Estação A` &lt;- paste(myshp@data$NomeA, &quot; (&quot;, myshp@data$A,&quot;)&quot;, sep=&quot;&quot;)
+myshp@data$`Nome Estação B` &lt;- paste(myshp@data$NomeB, &quot; (&quot;, myshp@data$B,&quot;)&quot;, sep=&quot;&quot;)
+myshp2@data$`Código Estação` &lt;- paste(myshp2@data$`Nome Estação`, &quot; (&quot;, myshp2@data$`Código Estação`,&quot;)&quot;, sep=&quot;&quot;)
 
-# Drop das colunas desnecessarias
-myshp@data &lt;- myshp@data[ , !names(myshp@data) %in% c(&quot;CodigoLinh&quot;, &quot;CodigoLi00&quot;,
-                                                      &quot;CodigoEsta&quot;, &quot;CodigoBito&quot;,
-                                                      &quot;NumeroSequ&quot;, &quot;IndicadorC&quot;,
-                                                      &quot;IndicadorE&quot;, &quot;CodigoLinha&quot;,
-                                                      &quot;CodigoEstacao&quot;, &quot;CodigoTresC&quot;,
-                                                      &quot;CodigoLinh&quot;, &quot;CodigoLi00&quot;,
-                                                      &quot;CodigoEsta&quot;, &quot;CodigoFerr&quot;,
-                                                      &quot;CodigoFerrovia&quot;, &quot;SiglaFerrovia&quot;,
-                                                      &quot;LogotipoFerrovia&quot;, &quot;DataExclusao&quot;,
-                                                      &quot;IndicadorObrigatorioDesempenhoProducao&quot;,
-                                                      &quot;CodigoLinha&quot;, &quot;CodigoEstacao&quot;,
-                                                      &quot;linesta&quot;, &quot;Ferrovia&quot;, &quot;Linha&quot;,
-                                                      &quot;X&quot;, &quot;Ferrovia&quot;, &quot;Linha&quot;, &quot;A&quot;, &quot;B&quot;,
-                                                      &quot;x&quot;, &quot;CodigoTresLetrasEstacao&quot;,
-                                                      &quot;ExtensÃ.o..km.&quot;)]
+myshp@data &lt;- select(myshp@data, -c(B, A, linesta, CodigoEsta, CodigoLi00, CodigoFerr,
+                                    CodigoLinh, NumeroSequ, IndicadorC, IndicadorE,
+                                    NomeReduzidoFerrovia, LogotipoFerrovia, DataExclusao,
+                                    IndicadorObrigatorioDesempenhoProducao, CodigoTresLetrasEstacao,
+                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB, &quot;Nome Estação A&quot;,
+                                    &quot;Nome Estação B&quot;))
 
-# Alteração do nome das colunas
-colnames(myshp@data)[which(names(myshp@data) == &quot;NumeroQuil&quot;)] &lt;- &quot;Marco Quilométrico&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;NumeroExte&quot;)] &lt;- &quot;Extensão do Entre Pátio (km)&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;NomeFerrovia&quot;)] &lt;- &quot;Ferrovia&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;NomeReduzidoFerrovia&quot;)] &lt;- &quot;Sigla-Ferrovia&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;NomeLinha&quot;)] &lt;- &quot;Linha&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;Instalada&quot;)] &lt;- &quot;Capacidade Instalada&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;Trens&quot;)] &lt;- &quot;Capacidade Vinculada&quot;
-colnames(myshp@data)[which(names(myshp@data) == &quot;Utilizada&quot;)] &lt;- &quot;Saturação&quot;</code></pre>
+myshp@data &lt;- rename(myshp@data, &quot;Marco Quilométrico&quot; = NumeroQuil)
+myshp@data &lt;- rename(myshp@data, &quot;Extensão do Entre Pátio (km)&quot; = NumeroExte)
+myshp@data &lt;- rename(myshp@data, &quot;Ferrovia&quot; = NomeFerrovia)
+myshp@data &lt;- rename(myshp@data, &quot;Sigla - Ferrovia&quot; = SiglaFerrovia)
+
+# Cálculo da Ocupação da Capacidade Instalada
+myshp@data$OcupaçãoCrescente &lt;- myshp@data$`Vinculada Crescente`/myshp@data$`Instalada Crescente`
+myshp@data$OcupaçãoCrescente[is.na(myshp@data$OcupaçãoCrescente)] &lt;- 0
+myshp@data$OcupaçãoDecrescente &lt;- myshp@data$`Vinculada Decrescente`/myshp@data$`Instalada Decrescente`
+myshp@data$OcupaçãoDecrescente[is.na(myshp@data$OcupaçãoDecrescente)] &lt;- 0
+
+# Criação da Coluna Ocupação, com o maior valor percentual dentre as colunas OcupaçãoCrescente e OcupaçãoDecrescente
+l &lt;- vector(&quot;list&quot;, length(myshp@data$OcupaçãoDecrescente))
+for (i in c(1:length(myshp@data$OcupaçãoDecrescente))){
+  l[[i]] = max(myshp@data[i,c(&quot;OcupaçãoCrescente&quot;, &quot;OcupaçãoDecrescente&quot;)], na.rm=TRUE)
+}
+l &lt;- lapply(l, FUN = function(x) ifelse(is.nan(x),NA,x))
+l &lt;- lapply(l, FUN = function(x) ifelse(is.infinite(x),NA,x))
+myshp@data$Ocupação &lt;- unlist(l)
+myshp@data$Ocupação[myshp@data$Ocupação == 0] &lt;- NA
+myshp@data$Ocupação &lt;- round(myshp@data$Ocupação, digits=2)
+
+myshp@data &lt;- myshp@data %&gt;%
+  select(&quot;Ferrovia&quot;, &quot;Sigla - Ferrovia&quot;, &quot;Nome Estação A&quot;, &quot;Nome Estação B&quot;, everything())</code></pre>
 </div>
 <div id="da-criação-da-interface-gráfica" class="section level3">
 <h3>Da Criação da Interface Gráfica</h3>
 <p>Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.</p>
 <p>O lançamento do pacote <code>leaflet</code> em 2015 revolucionou a criação de mapas em formato ‘web’ ao possibilitar sua integração com a linguagem de programação R e os pacotes <code>tmap</code> e <code>mapview</code> ampliaram as possibilidades do <code>leaflet</code>.</p>
-<p>O pacote <code>mapview</code> possui sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, além de possibilitar a construção de diferentes camadas em um único mapa e opções de atribuição de cor a elementos da base de dados georreferenciada.</p>
-<p>Portanto, foi utilizado o pacote <code>mapview</code> para a criação da Interface Gráfica da Declaração de Rede.</p>
+<p>Com sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, o pacote uutilizado para a construção da Interface Gráfica da Declaração de Rede foi o <code>mapview</code>.</p>
 <pre class="r"><code>library(mapview)
-library(leaflet)
+library(leaflet.extras)
 library(RColorBrewer)
 
+# Construção da paleta de cores a ser usada no mapa para representação da Ocupação
 red = colorRampPalette(c(&#39;green&#39;, &#39;yellow&#39;,&#39;red&#39;))
 
-m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
-              legend = TRUE,
-              layer.name = &#39;Utilização da Capacidade Instalada&#39;,
-              color = red)</code></pre>
+# Logo ANTT
+img &lt;- &quot;https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Logo_ANTT.svg/1200px-Logo_ANTT.svg.png&quot;
+
+# Criação do mapa
+mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
+                legend = TRUE,
+                layer.name = &#39;&#39;,
+                color = red) %&gt;% 
+  
+  leafem::addLogo(img, width = 120, height = 60, url = &quot;http://www.antt.gov.br/&quot;, position=&quot;topleft&quot;) %&gt;%
+  
+  addControl(&quot;Pesquisa de Estações&quot;,
+             position = &quot;topleft&quot;) %&gt;%
+  
+  addCircleMarkers(data = myshp2, lng = myshp2@coords[,1],
+                   lat=myshp2@coords[,2],
+                   popup = ~`Código Estação`,
+                   label=~`Código Estação`,
+                   group=&#39;Código Estação&#39;) %&gt;%
+  
+  addSearchFeatures(targetGroups = &#39;Código Estação&#39;,
+                    options = searchFeaturesOptions(
+                      zoom=12, openPopup = TRUE, firstTipSubmit = TRUE,
+                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %&gt;%
+  
+  hideGroup(&#39;Código Estação&#39;)</code></pre>
 </div>
 <div id="dos-dados-apresentados" class="section level3">
 <h3>Dos Dados Apresentados</h3>
-<p>A Versão 0.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderede6.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
+<p>A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
 <ul>
 <li>o marco quilométrico de início do trecho entre pátio;</li>
 <li>a extensão, em km, do trecho entre pátio;</li>
 <li>a Ferrovia e sua abreviação a quem o trecho entre pátio está concedido;</li>
-<li>o nome da Linha a qual pertence o trecho entre pátio;</li>
 <li>o ano de referência;</li>
+<li>o nome da Linha a qual pertence o trecho entre pátio;</li>
 <li>a bitola do trecho entre pátio;</li>
 <li>o nº de linhas (singela ou dupla) do trecho entre pátio;</li>
 <li>o sentido de tráfego do trecho entre pátio;</li>
 <li>o sistema de sinalização do trecho entre pátio;</li>
 <li>a Capacidade Instalada do trecho entre pátio;</li>
 <li>a Capacidade Vinculada do trecho entre pátio; e</li>
-<li>a Saturação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.</li>
+<li>a Ocupação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.</li>
 </ul>
 </div>
 <div id="session-information" class="section level3">
 <h3>Session Information</h3>
-<pre><code>## R version 3.5.1 (2018-07-02)
+<pre><code>## R version 3.6.3 (2020-02-29)
 ## Platform: x86_64-w64-mingw32/x64 (64-bit)
-## Running under: Windows 10 x64 (build 17134)
+## Running under: Windows 10 x64 (build 18362)
 ## 
 ## Matrix products: default
 ## 
@@ -540,38 +576,34 @@ m3 &lt;- mapview(myshp, zcol=&quot;dummy&quot;,
 ## [1] stats     graphics  grDevices utils     datasets  methods   base     
 ## 
 ## other attached packages:
-## [1] dplyr_0.8.3        RColorBrewer_1.1-2 leaflet_2.0.3     
-## [4] mapview_2.7.0      rgdal_1.4-8        sp_1.3-2          
+## [1] RColorBrewer_1.1-2   dplyr_0.8.5          rgdal_1.4-8         
+## [4] sp_1.4-1             leaflet.extras_1.0.0 mapview_2.8.1       
+## [7] leaflet_2.0.3.9000  
 ## 
 ## loaded via a namespace (and not attached):
-##  [1] tidyselect_0.2.5   xfun_0.9           purrr_0.3.3       
-##  [4] sf_0.8-0           lattice_0.20-35    colorspace_1.3-2  
-##  [7] htmltools_0.4.0    stats4_3.5.1       viridisLite_0.3.0 
-## [10] yaml_2.2.0         base64enc_0.1-3    rlang_0.4.5       
-## [13] e1071_1.7-3        later_1.0.0        pillar_1.4.2      
-## [16] glue_1.3.0         DBI_1.0.0          stringr_1.3.1     
-## [19] munsell_0.5.0      raster_3.0-7       htmlwidgets_1.5.1 
-## [22] codetools_0.2-15   evaluate_0.14      knitr_1.24        
-## [25] fastmap_1.0.1      httpuv_1.5.2       crosstalk_1.0.0   
-## [28] class_7.3-14       Rcpp_1.0.3         KernSmooth_2.23-15
-## [31] xtable_1.8-4       promises_1.1.0     scales_1.0.0      
-## [34] classInt_0.4-2     satellite_1.0.2    webshot_0.5.2     
-## [37] mime_0.6           png_0.1-7          digest_0.6.18     
-## [40] stringi_1.2.4      shiny_1.4.0        grid_3.5.1        
-## [43] tools_3.5.1        magrittr_1.5       tibble_2.1.3      
-## [46] crayon_1.3.4       pkgconfig_2.0.2    assertthat_0.2.0  
-## [49] rmarkdown_2.1      R6_2.3.0           units_0.6-5       
-## [52] compiler_3.5.1</code></pre>
+##  [1] Rcpp_1.0.4         pillar_1.4.3       compiler_3.6.3     base64enc_0.1-3   
+##  [5] class_7.3-15       tools_3.6.3        digest_0.6.25      tibble_2.1.3      
+##  [9] viridisLite_0.3.0  satellite_1.0.2    evaluate_0.14      lifecycle_0.2.0   
+## [13] lattice_0.20-38    pkgconfig_2.0.3    png_0.1-7          rlang_0.4.5       
+## [17] DBI_1.1.0          crosstalk_1.1.0.1  yaml_2.2.1         xfun_0.12         
+## [21] e1071_1.7-3        stringr_1.4.0      raster_3.0-12      knitr_1.28        
+## [25] htmlwidgets_1.5.1  tidyselect_1.0.0   webshot_0.5.2      stats4_3.6.3      
+## [29] classInt_0.4-2     grid_3.6.3         glue_1.3.2         sf_0.9-0          
+## [33] R6_2.4.1           rmarkdown_2.1      purrr_0.3.3        magrittr_1.5      
+## [37] scales_1.1.0       codetools_0.2-16   htmltools_0.4.0    units_0.6-6       
+## [41] assertthat_0.2.1   colorspace_1.4-1   KernSmooth_2.23-16 stringi_1.4.6     
+## [45] munsell_0.5.0      leafem_0.1.0       crayon_1.3.4</code></pre>
 </div>
 </div>
 <div id="considerações-finais" class="section level1">
 <h1>Considerações Finais</h1>
-<p>A primeira versão da Interface Gráfica da Declaração de Rede está disponível no <a href="https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html">link</a>. As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
+<p>As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
 <div id="controle-de-versão" class="section level3">
 <h3>Controle de Versão</h3>
+<p><a href="https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html">v-0.4</a>: Inclusão de ferramenta de pesquisa, atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020</p>
 <p><a href="https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html">v-0.3</a>: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020</p>
-<p><a href="https://declaracaoderedev02.imfast.io/DR_Interface_Grafica.html">v-0.2</a>: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020</p>
-<p><a href="https://declaracaoderedev01.imfast.io/DR_Interface_Grafica.html">v-0.1</a>: Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020</p>
+<p>v-0.2: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020</p>
+<p>v-0.1: Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020</p>
 </div>
 </div>
 <div id="section" class="section level1">
