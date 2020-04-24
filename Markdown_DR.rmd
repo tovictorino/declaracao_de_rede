@@ -37,7 +37,7 @@ A Interface Gráfica da Declaração de Rede foi inteiramente construída na lin
 ### Shapefile e Tabela de Atributos
 Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
 
-O shapefile é do tipo ESRI vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
+O shapefile é do tipo ESRI vetorial LineString. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
 
 A leitura do Shapefile se deu por meio do pacote `rgdal`.
 
@@ -152,14 +152,13 @@ myshp@data <- myshp@data %>%
 ```
 
 ### Da Criação da Interface Gráfica
-Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.
+Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; avançando em relação à apresentação em forma de planilhas.
 
-O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R e os pacotes `tmap` e `mapview` ampliaram as possibilidades do `leaflet`.
-
-Com sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, o pacote uutilizado para a construção da Interface Gráfica da Declaração de Rede foi o `mapview`.
+O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R. Os pacotes `leaflet.extra` e `mapview` ampliaram as possibilidades do `leaflet` com a inclusão de novas funcionalidades de customização e a utilização em conjunto desses pacotes mostrou-se ideal para o presente projeto.
 
 ``` {r eval = FALSE}
 library(mapview)
+library(leaflet)
 library(leaflet.extras)
 library(RColorBrewer)
 
@@ -195,7 +194,7 @@ mapa <- mapview(myshp, zcol="Ocupação",
 ```
 
 ### Dos Dados Apresentados
-A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html):
+A Versão 1.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html):
 
 * o marco quilométrico de início do trecho entre pátio;
 * a extensão, em km, do trecho entre pátio;
@@ -226,9 +225,11 @@ info
 As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
-[v-0.4](https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html): Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
+[v-1.0](https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html): Atualização da documentação. 24/04/2020
 
-[v-0.3](https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html): Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
+v-0.4: Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
+
+v-0.3: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
 
 v-0.2: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
 

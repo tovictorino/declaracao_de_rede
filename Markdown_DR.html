@@ -397,7 +397,7 @@ text-align: justify}
 <div id="shapefile-e-tabela-de-atributos" class="section level3">
 <h3>Shapefile e Tabela de Atributos</h3>
 <p>Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
-<p>O shapefile é do tipo ESRI vetorial e contém uma tabela de atributos alfa-numérica e descritiva. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
+<p>O shapefile é do tipo ESRI vetorial LineString. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
 <p>A leitura do Shapefile se deu por meio do pacote <code>rgdal</code>.</p>
 <pre class="r"><code>library(rgdal)
 
@@ -504,10 +504,10 @@ myshp@data &lt;- myshp@data %&gt;%
 </div>
 <div id="da-criação-da-interface-gráfica" class="section level3">
 <h3>Da Criação da Interface Gráfica</h3>
-<p>Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; não mais em planilhas.</p>
-<p>O lançamento do pacote <code>leaflet</code> em 2015 revolucionou a criação de mapas em formato ‘web’ ao possibilitar sua integração com a linguagem de programação R e os pacotes <code>tmap</code> e <code>mapview</code> ampliaram as possibilidades do <code>leaflet</code>.</p>
-<p>Com sintaxe concisa e funcionalidades GIS como posição georreferenciada do mouse, escala, tabela de atributos via popups e zoom, o pacote uutilizado para a construção da Interface Gráfica da Declaração de Rede foi o <code>mapview</code>.</p>
+<p>Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; avançando em relação à apresentação em forma de planilhas.</p>
+<p>O lançamento do pacote <code>leaflet</code> em 2015 revolucionou a criação de mapas em formato ‘web’ ao possibilitar sua integração com a linguagem de programação R. Os pacotes <code>leaflet.extra</code> e <code>mapview</code> ampliaram as possibilidades do <code>leaflet</code> com a inclusão de novas funcionalidades de customização e a utilização em conjunto desses pacotes mostrou-se ideal para o presente projeto.</p>
 <pre class="r"><code>library(mapview)
+library(leaflet)
 library(leaflet.extras)
 library(RColorBrewer)
 
@@ -543,7 +543,7 @@ mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
 </div>
 <div id="dos-dados-apresentados" class="section level3">
 <h3>Dos Dados Apresentados</h3>
-<p>A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
+<p>A Versão 1.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
 <ul>
 <li>o marco quilométrico de início do trecho entre pátio;</li>
 <li>a extensão, em km, do trecho entre pátio;</li>
@@ -600,8 +600,9 @@ mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
 <p>As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
 <div id="controle-de-versão" class="section level3">
 <h3>Controle de Versão</h3>
-<p><a href="https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html">v-0.4</a>: Inclusão de ferramenta de pesquisa, atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020</p>
-<p><a href="https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html">v-0.3</a>: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020</p>
+<p><a href="https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html">v-1.0</a>: Atualização da documentação. 24/04/2020</p>
+<p>v-0.4: Inclusão de ferramenta de pesquisa, atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020</p>
+<p>v-0.3: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020</p>
 <p>v-0.2: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020</p>
 <p>v-0.1: Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020</p>
 </div>
