@@ -195,7 +195,7 @@ mapa <- mapview(myshp, zcol="Ocupação",
 ```
 
 ### Dos Dados Apresentados
-A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html):
+A Versão 0.4 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html):
 
 * o marco quilométrico de início do trecho entre pátio;
 * a extensão, em km, do trecho entre pátio;
@@ -226,7 +226,7 @@ info
 As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
-[v-0.4](https://declaracaoderedev041.imfast.io/DR_Interface_Grafica.html): Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
+[v-0.4](https://declaracaoderedev04.imfast.io/DR_Interface_Grafica.html): Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
 
 [v-0.3](https://declaracaoderedev032.imfast.io/DR_Interface_Grafica.html): Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
 
