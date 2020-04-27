@@ -122,13 +122,17 @@ myshp@data <- select(myshp@data, -c(B, A, linesta, CodigoEsta, CodigoLi00, Codig
                                     CodigoLinh, NumeroSequ, IndicadorC, IndicadorE,
                                     NomeReduzidoFerrovia, LogotipoFerrovia, DataExclusao,
                                     IndicadorObrigatorioDesempenhoProducao, CodigoTresLetrasEstacao,
-                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB, "Nome Estação A",
-                                    "Nome Estação B"))
+                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB,
+                                    CodigoFerrovia, CodigoLinha, CodigoEstacao))
 
 myshp@data <- rename(myshp@data, "Marco Quilométrico" = NumeroQuil)
 myshp@data <- rename(myshp@data, "Extensão do Entre Pátio (km)" = NumeroExte)
 myshp@data <- rename(myshp@data, "Ferrovia" = NomeFerrovia)
 myshp@data <- rename(myshp@data, "Sigla - Ferrovia" = SiglaFerrovia)
+myshp@data <- rename(myshp@data, "Instalada Crescente (Trens/dia)" = "Instalada Crescente")
+myshp@data <- rename(myshp@data, "Instalada Decrescente (Trens/dia)" = "Instalada Decrescente")
+myshp@data <- rename(myshp@data, "Vinculada Crescente (Trens/dia)" = "Vinculada Crescente")
+myshp@data <- rename(myshp@data, "Vinculada Decrescente (Trens/dia)" = "Vinculada Decrescente")
 
 # Cálculo da Ocupação da Capacidade Instalada
 myshp@data$OcupaçãoCrescente <- myshp@data$`Vinculada Crescente`/myshp@data$`Instalada Crescente`
@@ -146,9 +150,16 @@ l <- lapply(l, FUN = function(x) ifelse(is.infinite(x),NA,x))
 myshp@data$Ocupação <- unlist(l)
 myshp@data$Ocupação[myshp@data$Ocupação == 0] <- NA
 myshp@data$Ocupação <- round(myshp@data$Ocupação, digits=2)
+myshp@data$`Instalada Crescente (Trens/dia)` <- round(myshp@data$`Instalada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Instalada Decrescente (Trens/dia)` <- round(myshp@data$`Instalada Decrescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Crescente (Trens/dia)` <- round(myshp@data$`Vinculada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Decrescente (Trens/dia)` <- round(myshp@data$`Vinculada Decrescente (Trens/dia)`, digits=2)
 
 myshp@data <- myshp@data %>%
   select("Ferrovia", "Sigla - Ferrovia", "Nome Estação A", "Nome Estação B", everything())
+
+myshp@data <- select(myshp@data, -c(OcupaçãoCrescente,
+                                    OcupaçãoDecrescente))
 ```
 
 ### Da Criação da Interface Gráfica
@@ -194,7 +205,7 @@ mapa <- mapview(myshp, zcol="Ocupação",
 ```
 
 ### Dos Dados Apresentados
-A Versão 1.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html):
+A Versão 1.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev11.imfast.io/DR_Interface_Grafica.html):
 
 * o marco quilométrico de início do trecho entre pátio;
 * a extensão, em km, do trecho entre pátio;
@@ -225,7 +236,10 @@ info
 As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
 
 ### Controle de Versão
-[v-1.0](https://declaracaoderedev10.imfast.io/DR_Interface_Grafica.html): Atualização da documentação. 24/04/2020
+
+[v-1.1](https://declaracaoderedev11.imfast.io/DR_Interface_Grafica.html): Inclusão da unidade de medida de capacidade e atualização da documentação. 27/04/2020
+
+v-1.0: Atualização da documentação. 24/04/2020
 
 v-0.4: Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
 

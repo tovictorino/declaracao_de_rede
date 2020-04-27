@@ -474,13 +474,17 @@ myshp@data &lt;- select(myshp@data, -c(B, A, linesta, CodigoEsta, CodigoLi00, Co
                                     CodigoLinh, NumeroSequ, IndicadorC, IndicadorE,
                                     NomeReduzidoFerrovia, LogotipoFerrovia, DataExclusao,
                                     IndicadorObrigatorioDesempenhoProducao, CodigoTresLetrasEstacao,
-                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB, &quot;Nome Estação A&quot;,
-                                    &quot;Nome Estação B&quot;))
+                                    Ferrovia, CodigoBito, NomeLinha, NomeA, NomeB,
+                                    CodigoFerrovia, CodigoLinha, CodigoEstacao))
 
 myshp@data &lt;- rename(myshp@data, &quot;Marco Quilométrico&quot; = NumeroQuil)
 myshp@data &lt;- rename(myshp@data, &quot;Extensão do Entre Pátio (km)&quot; = NumeroExte)
 myshp@data &lt;- rename(myshp@data, &quot;Ferrovia&quot; = NomeFerrovia)
 myshp@data &lt;- rename(myshp@data, &quot;Sigla - Ferrovia&quot; = SiglaFerrovia)
+myshp@data &lt;- rename(myshp@data, &quot;Instalada Crescente (Trens/dia)&quot; = &quot;Instalada Crescente&quot;)
+myshp@data &lt;- rename(myshp@data, &quot;Instalada Decrescente (Trens/dia)&quot; = &quot;Instalada Decrescente&quot;)
+myshp@data &lt;- rename(myshp@data, &quot;Vinculada Crescente (Trens/dia)&quot; = &quot;Vinculada Crescente&quot;)
+myshp@data &lt;- rename(myshp@data, &quot;Vinculada Decrescente (Trens/dia)&quot; = &quot;Vinculada Decrescente&quot;)
 
 # Cálculo da Ocupação da Capacidade Instalada
 myshp@data$OcupaçãoCrescente &lt;- myshp@data$`Vinculada Crescente`/myshp@data$`Instalada Crescente`
@@ -498,9 +502,16 @@ l &lt;- lapply(l, FUN = function(x) ifelse(is.infinite(x),NA,x))
 myshp@data$Ocupação &lt;- unlist(l)
 myshp@data$Ocupação[myshp@data$Ocupação == 0] &lt;- NA
 myshp@data$Ocupação &lt;- round(myshp@data$Ocupação, digits=2)
+myshp@data$`Instalada Crescente (Trens/dia)` &lt;- round(myshp@data$`Instalada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Instalada Decrescente (Trens/dia)` &lt;- round(myshp@data$`Instalada Decrescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Crescente (Trens/dia)` &lt;- round(myshp@data$`Vinculada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Decrescente (Trens/dia)` &lt;- round(myshp@data$`Vinculada Decrescente (Trens/dia)`, digits=2)
 
 myshp@data &lt;- myshp@data %&gt;%
-  select(&quot;Ferrovia&quot;, &quot;Sigla - Ferrovia&quot;, &quot;Nome Estação A&quot;, &quot;Nome Estação B&quot;, everything())</code></pre>
+  select(&quot;Ferrovia&quot;, &quot;Sigla - Ferrovia&quot;, &quot;Nome Estação A&quot;, &quot;Nome Estação B&quot;, everything())
+
+myshp@data &lt;- select(myshp@data, -c(OcupaçãoCrescente,
+                                    OcupaçãoDecrescente))</code></pre>
 </div>
 <div id="da-criação-da-interface-gráfica" class="section level3">
 <h3>Da Criação da Interface Gráfica</h3>

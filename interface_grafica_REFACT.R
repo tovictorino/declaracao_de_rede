@@ -4,6 +4,7 @@ library(leaflet.extras)
 library(rgdal)
 library(dplyr)
 library(RColorBrewer)
+library(rmarkdown)
 
 ####################### MAPA DO SUBSISTEMA FERROVIÁRIO FEDERAL #######################
 
@@ -87,6 +88,10 @@ myshp@data <- rename(myshp@data, "Marco Quilométrico" = NumeroQuil)
 myshp@data <- rename(myshp@data, "Extensão do Entre Pátio (km)" = NumeroExte)
 myshp@data <- rename(myshp@data, "Ferrovia" = NomeFerrovia)
 myshp@data <- rename(myshp@data, "Sigla - Ferrovia" = SiglaFerrovia)
+myshp@data <- rename(myshp@data, "Instalada Crescente (Trens/dia)" = "Instalada Crescente")
+myshp@data <- rename(myshp@data, "Instalada Decrescente (Trens/dia)" = "Instalada Decrescente")
+myshp@data <- rename(myshp@data, "Vinculada Crescente (Trens/dia)" = "Vinculada Crescente")
+myshp@data <- rename(myshp@data, "Vinculada Decrescente (Trens/dia)" = "Vinculada Decrescente")
 
 # Cálculo da Ocupação da Capacidade Instalada
 myshp@data$OcupaçãoCrescente <- myshp@data$`Vinculada Crescente`/myshp@data$`Instalada Crescente`
@@ -104,9 +109,16 @@ l <- lapply(l, FUN = function(x) ifelse(is.infinite(x),NA,x))
 myshp@data$Ocupação <- unlist(l)
 myshp@data$Ocupação[myshp@data$Ocupação == 0] <- NA
 myshp@data$Ocupação <- round(myshp@data$Ocupação, digits=2)
+myshp@data$`Instalada Crescente (Trens/dia)` <- round(myshp@data$`Instalada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Instalada Decrescente (Trens/dia)` <- round(myshp@data$`Instalada Decrescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Crescente (Trens/dia)` <- round(myshp@data$`Vinculada Crescente (Trens/dia)`, digits=2)
+myshp@data$`Vinculada Decrescente (Trens/dia)` <- round(myshp@data$`Vinculada Decrescente (Trens/dia)`, digits=2)
 
 myshp@data <- myshp@data %>%
   select("Ferrovia", "Sigla - Ferrovia", "Nome Estação A", "Nome Estação B", everything())
+
+myshp@data <- select(myshp@data, -c(OcupaçãoCrescente,
+                                    OcupaçãoDecrescente))
 
 # Construção da paleta de cores a ser usada no mapa para representação da Ocupação
 red = colorRampPalette(c('green', 'yellow','red'))
@@ -130,12 +142,13 @@ mapa <- mapview(myshp, zcol="Ocupação",
                    lat=myshp2@coords[,2],
                    popup = ~`Código Estação`,
                    label=~`Código Estação`,
-                   group='Código Estação') %>%
+                   group='Código Estação',
+                   clusterOptions = markerClusterOptions()) %>%
   
   addSearchFeatures(targetGroups = 'Código Estação',
                     options = searchFeaturesOptions(
                       zoom=12, openPopup = TRUE, firstTipSubmit = TRUE,
-                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %>%
+                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %>% 
   
   hideGroup('Código Estação')
 
