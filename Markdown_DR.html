@@ -529,10 +529,10 @@ red = colorRampPalette(c(&#39;green&#39;, &#39;yellow&#39;,&#39;red&#39;))
 img &lt;- &quot;https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Logo_ANTT.svg/1200px-Logo_ANTT.svg.png&quot;
 
 # Criação do mapa
-mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
-                legend = TRUE,
-                layer.name = &#39;&#39;,
-                color = red) %&gt;% 
+map &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
+               legend = TRUE,
+               layer.name = &#39;&#39;,
+               color = red) %&gt;% 
   
   leafem::addLogo(img, width = 120, height = 60, url = &quot;http://www.antt.gov.br/&quot;, position=&quot;topleft&quot;) %&gt;%
   
@@ -543,18 +543,22 @@ mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
                    lat=myshp2@coords[,2],
                    popup = ~`Código Estação`,
                    label=~`Código Estação`,
-                   group=&#39;Código Estação&#39;) %&gt;%
+                   group=&#39;Estações&#39;) %&gt;%
   
-  addSearchFeatures(targetGroups = &#39;Código Estação&#39;,
+  addSearchFeatures(targetGroups = &#39;Estações&#39;,
                     options = searchFeaturesOptions(
                       zoom=12, openPopup = TRUE, firstTipSubmit = TRUE,
-                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %&gt;%
+                      autoCollapse = FALSE, hideMarkerOnCollapse = FALSE)) %&gt;% 
   
-  hideGroup(&#39;Código Estação&#39;)</code></pre>
+  addLayersControl(overlayGroups = c(&quot;Estações&quot;),
+                   options = layersControlOptions(collapsed = FALSE),
+                   position=&#39;topleft&#39;) %&gt;%
+  
+  groupOptions(&quot;Estações&quot;, zoomLevels = 10:30)</code></pre>
 </div>
 <div id="dos-dados-apresentados" class="section level3">
 <h3>Dos Dados Apresentados</h3>
-<p>A Versão 1.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev11.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
+<p>A Versão 2.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
 <ul>
 <li>o marco quilométrico de início do trecho entre pátio;</li>
 <li>a extensão, em km, do trecho entre pátio;</li>
@@ -611,7 +615,8 @@ mapa &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
 <p>As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a>.</p>
 <div id="controle-de-versão" class="section level3">
 <h3>Controle de Versão</h3>
-<p><a href="https://declaracaoderedev11.imfast.io/DR_Interface_Grafica.html">v-1.1</a>: Inclusão da unidade de medida de capacidade e atualização da documentação. 27/04/2020</p>
+<p><a href="https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html">v-2.0</a>: Estações visíveis a partir do nível 10 de zoom ou por seleção da opção “Estações” abaixo do campo de pesquisa e atualização da documentação. 28/04/2020</p>
+<p>v-1.1: Inclusão da unidade de medida de capacidade e atualização da documentação. 27/04/2020</p>
 <p>v-1.0: Atualização da documentação. 24/04/2020</p>
 <p>v-0.4: Inclusão de ferramenta de pesquisa, atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020</p>
 <p>v-0.3: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020</p>

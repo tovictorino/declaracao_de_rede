@@ -1,64 +1,24 @@
----
-  title:
-  output: html_document
----
-
-# Declaração de Rede - Interface Gráfica
-***
-
-
-<style>
-body {
-text-align: justify}
-</style>
-
-# Introdução
-Entende-se por Declaração de Rede o documento apresentado obrigatoriamente à ANTT pelas concessionárias/subconcessionárias de serviço público de transporte ferroviário de cargas, o qual deve conter necessariamente um conjunto de informações a respeito da malha ferroviária federal concedida, nos termos da Resolução ANTT nº 3.695/2011, Anexo, art. 5º.
-  
-A DR tem por objetivo consolidar as informações técnico operacionais de todo o Subsistema Ferroviário Federal, ocupando lugar de destaque dentre os instrumentos regulatórios, contribuindo para a redução da assimetria de informações do setor.
-  
-Dentre outras informações, a Declaração de Rede deve conter o inventário de capacidade, ou seja, a capacidade instalada, a capacidade vinculada e a capacidade ociosa dos trechos ferroviários, informações relevantes, sobretudo para o mercado regulado e para os usuários, conforme consta da Resolução ANTT nº 3.695/2011, Anexo, art. 5º, inc. III.
-   
-Nesse contexto, com o objetivo de apresentar o Inventário de Capacidade de forma intuitiva, georreferenciada, interativa e, sobretudo, mais transparente, deu-se início ao projeto de criação da Interface Gráfica da Declaração de Rede.
-
-O presente documento apresentará o processo de criação e os resultados obtidos.
-
-# Equipe
-O Projeto foi desenvolvido pela equipe da Gerência de Regulação e Outorgas Ferroviárias.
-
-* Marcelo Amorelli - Gerente de Regulação e Outorgas - marcelo.amorelli@antt.gov.br
-* Gilson Matos - Coordenador de Regulamentação e Outorgas - gilson.matos@antt.gov.br
-* Leonardo Silva - Coordenador de Regulação dos Serviços Ferroviários - leonardo.silva@antt.gov.br
-* Thiago Victorino - Líder do Projeto - thiago.victorino@antt.gov.br
-
-# Da Implementação
-A Interface Gráfica da Declaração de Rede foi inteiramente construída na linguagem de programação R com auxílio dos pacotes `dplyr`, `rgdal`, `mapview`, `leaflet` e `leaflet.extras`.
-
-### Shapefile e Tabela de Atributos
-Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.
-
-O shapefile é do tipo ESRI vetorial LineString. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.
-
-A leitura do Shapefile se deu por meio do pacote `rgdal`.
-
-``` {r eval = FALSE}
+library(leaflet)
+library(mapview)
+library(leaflet.extras)
 library(rgdal)
+library(dplyr)
+library(RColorBrewer)
+library(rmarkdown)
 
-# Leitura da base georreferenciadas
+
+####################### MAPA DO SUBSISTEMA FERROVIÁRIO FEDERAL #######################
+
+####################### AJUSTES AO SHAPEFILE ####################### 
+
+
+# Leitura das bases georreferenciadas
 ## myshp é um shapefile do tipo linestring das linhas do SFF. 
 ## myshp2 é um shapefile do tipo point das estações cadastradas na Declaração de Rede
-myshp <- readOGR(dsn=path.expand("SFF_shapefile"),
+myshp <- readOGR(dsn=path.expand("shp_atualizado"),
                  layer="dbo_tblLinhaEstacao_spatial_linestring", stringsAsFactors = FALSE)
 myshp2 <- readOGR(dsn=path.expand("shp_atualizado"),
                   layer="dbo_tblEstacao_spatial_point", stringsAsFactors = FALSE, encoding = "UTF-8")
-```
-
-Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroviárias, nome das estações que delimitam cada elemento Linestring e foram incluídas as demais características pertinentes à interface gráfica.
-
-A manipulação da tabela de atributos se deu por meio dos pacotes `dplyr` e `plyr` conforme apresentado a seguir.
-
-``` {r eval = FALSE}
-library(dplyr)
 
 # Substituição do CodigoFerr, antes numérico, agora string, com o nome das estações cadastradas na DR
 tblFerrovia <- readxl::read_excel("Dados/tblFerrovia.xlsx")
@@ -160,24 +120,13 @@ myshp@data <- myshp@data %>%
 
 myshp@data <- select(myshp@data, -c(OcupaçãoCrescente,
                                     OcupaçãoDecrescente))
-```
-
-### Da Criação da Interface Gráfica
-Como vetor de condução do projeto, a proposta inicial era a criação de uma interface gráfica que possibilitasse não só a visualização por parte do usuário, mas sua interação direta com os elementos do mapa, de forma a apresentar os principais dados da Declaração de Rede em um contexto georreferenciado; avançando em relação à apresentação em forma de planilhas.
-
-O lançamento do pacote `leaflet` em 2015 revolucionou a criação de mapas em formato 'web' ao possibilitar sua integração com a linguagem de programação R. Os pacotes `leaflet.extra` e `mapview` ampliaram as possibilidades do `leaflet` com a inclusão de novas funcionalidades de customização e a utilização em conjunto desses pacotes mostrou-se ideal para o presente projeto.
-
-``` {r eval = FALSE}
-library(mapview)
-library(leaflet)
-library(leaflet.extras)
-library(RColorBrewer)
 
 # Construção da paleta de cores a ser usada no mapa para representação da Ocupação
 red = colorRampPalette(c('green', 'yellow','red'))
 
 # Logo ANTT
 img <- "https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Logo_ANTT.svg/1200px-Logo_ANTT.svg.png"
+urlh <- "https://github.com/tovictorino/declaracao_de_rede"
 
 # Criação do mapa
 map <- mapview(myshp, zcol="Ocupação",
@@ -206,61 +155,5 @@ map <- mapview(myshp, zcol="Ocupação",
                    position='topleft') %>%
   
   groupOptions("Estações", zoomLevels = 10:30)
-```
 
-### Dos Dados Apresentados
-A Versão 2.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no [mapa](https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html):
-
-* o marco quilométrico de início do trecho entre pátio;
-* a extensão, em km, do trecho entre pátio;
-* a Ferrovia e sua abreviação a quem o trecho entre pátio está concedido;
-* o ano de referência;
-* o nome da Linha a qual pertence o trecho entre pátio;
-* a bitola do trecho entre pátio;
-* o nº de linhas (singela ou dupla) do trecho entre pátio;
-* o sentido de tráfego do trecho entre pátio;
-* o sistema de sinalização do trecho entre pátio;
-* a Capacidade Instalada do trecho entre pátio;
-* a Capacidade Vinculada do trecho entre pátio; e
-* a Ocupação, como resultado da razão entre Capacidade Vinculada e Capacidade Instalada.
-
-### Session Information
-```{r someVar, echo=FALSE, message=FALSE, warning=FALSE}
-library(leaflet)
-library(mapview)
-library(leaflet.extras)
-library(rgdal)
-library(dplyr)
-library(RColorBrewer)
-info <- sessionInfo()
-info
-```
-
-# Considerações Finais
-As bases de dados, códigos e demais informações encontram-se públicas para consulta e contribuição no [GitHub](https://github.com/tovictorino/declaracao_de_rede).
-
-### Controle de Versão
-
-[v-2.0](https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html): Estações visíveis a partir do nível 10 de zoom ou por seleção da opção "Estações" abaixo do campo de pesquisa e atualização da documentação. 28/04/2020
-
-v-1.1: Inclusão da unidade de medida de capacidade e atualização da documentação. 27/04/2020
-
-v-1.0: Atualização da documentação. 24/04/2020
-
-v-0.4: Inclusão de ferramenta de pesquisa,  atualização da documentação e atualização das informações de capacidade da Rumo Malha Paulista e Rumo Malha Norte. 23/04/2020
-
-v-0.3: Ajuste de Informações FCA: Inclusão das informações de capacidade e características das linhas General Carneiro - Monte Azul e Calafate - General Carneiro. 23/03/2020
-
-v-0.2: Inclusão do capítulo Session Information na Documentação e ajustes textuais. 18/03/2020
-
-v-0.1: Versão preliminar da Interface Gráfica. Apresentação do nível de utilização da capacidade instalada. 13/03/2020
-
-# <a href='http://www.antt.gov.br/'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/Logo Vertical - colorida sem fundo.png' align="center" height="100" /></a> <a href='https://github.com/tovictorino/declaracao_de_rede'><img src='C:/2020/ANTT/Interface_Graf_GitHub/Imgs/GitHub-Mark-120px-plus.png' align="center" height="60" /></a>
-
-
-
-    
-    
-    
-    
-    
+mapshot(map, url = "DR_Interface_Grafica.html", selfcontained = FALSE)
