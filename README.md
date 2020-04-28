@@ -1,6 +1,6 @@
 # Declaração de Rede - Interface Gráfica
 
-GitHub oficial da [Interface Gráfica da Declaração de Rede Ferroviária da ANTT](https://declaracaoderedev11.imfast.io/DR_Interface_Grafica.html). Consulte a [Documentação](https://declaracaoderedev11.imfast.io/Markdown_DR.html).
+GitHub oficial da [Interface Gráfica da Declaração de Rede Ferroviária da ANTT](https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html). Consulte a [Documentação](https://declaracaoderedev20.imfast.io/Markdown_DR.html).
 
 Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
 
@@ -14,9 +14,11 @@ Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
 
 ### Versão Atual:
 
-v-1.1 - 27/04/2020
+v-2.0 - 28/04/2020
 
 Versões anteriores:
+
+v-1.1 - 27/04/2020
 
 v-1.0 - 24/04/2020
 
