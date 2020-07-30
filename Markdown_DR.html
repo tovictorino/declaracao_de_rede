@@ -395,8 +395,9 @@ text-align: justify}
 <div id="shapefile-e-tabela-de-atributos" class="section level3">
 <h3>Shapefile e Tabela de Atributos</h3>
 <p>Como base para todo o desenvolvimento da interface, foi utilizado o shapefile da Declaração de Rede 2020, construído e atualizado com o auxílio do Laboratório de Transportes e Logística - Labtrans da Universidade Federal de Santa Catarina.</p>
-<p>O shapefile é do tipo ESRI vetorial LineString. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
-<p>A leitura do Shapefile se deu por meio do pacote <code>rgdal</code>.</p>
+<p>O shapefile da malha ferroviária é do tipo <a href="http://help.arcgis.com/en/geodatabase/10.0/sdk/arcsde/concepts/geometry/shapes/types.htm">ESRI vetorial LineString</a>. Nesse tipo de estrutura, a localização e a feição geométrica dos elementos são representadas por linhas poligonais com no mínimo dois vértices conectados sem, no entanto, gerar um um poligono fechado.</p>
+<p>Já o shapefile das estações ferroviárias é do tipo <a href="http://help.arcgis.com/en/geodatabase/10.0/sdk/arcsde/concepts/geometry/shapes/types.htm">ESRI vetorial Point</a>.</p>
+<p>A leitura dos Shapefiles se deu por meio do pacote <code>rgdal</code>.</p>
 <pre class="r"><code>library(rgdal)
 
 # Leitura da base georreferenciadas
@@ -408,7 +409,7 @@ myshp2 &lt;- readOGR(dsn=path.expand(&quot;shp_atualizado&quot;),
                   layer=&quot;dbo_tblEstacao_spatial_point&quot;, stringsAsFactors = FALSE, encoding = &quot;UTF-8&quot;)
 str(myshp@data)
 str(myshp2@data)</code></pre>
-<p>Após a leitura do Shapefile, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroviárias, nome das estações que delimitam cada elemento Linestring e foram incluídas as demais características pertinentes à interface gráfica. Consulte o arquivo metadados.pdf no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a> para detalhes sobre as variáveis de cada base de dados utilizada.</p>
+<p>Após a leitura dos Shapefiles, foram incluídas na tabela de atributos as informações de nome da concessão ferroviária, nome das linhas ferroviárias, nome das estações que delimitam cada elemento Linestring e foram incluídas as demais características pertinentes à interface gráfica. Consulte o arquivo metadados.pdf no <a href="https://github.com/tovictorino/declaracao_de_rede">GitHub</a> para detalhes sobre as variáveis de cada base de dados utilizada.</p>
 <p>A manipulação da tabela de atributos se deu por meio dos pacotes <code>dplyr</code> e <code>plyr</code> conforme apresentado a seguir.</p>
 <pre class="r"><code>library(dplyr)
 
@@ -558,7 +559,7 @@ map &lt;- mapview(myshp, zcol=&quot;Ocupação&quot;,
 </div>
 <div id="dos-dados-apresentados" class="section level3">
 <h3>Dos Dados Apresentados</h3>
-<p>A Versão 2.0 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
+<p>A Versão 2.1 da Interface Gráfica da Declaração de Rede apresenta, na forma de pop-ups no <a href="https://declaracaoderedev20.imfast.io/DR_Interface_Grafica.html">mapa</a>:</p>
 <ul>
 <li>o marco quilométrico de início do trecho entre pátio;</li>
 <li>a extensão, em km, do trecho entre pátio;</li>
