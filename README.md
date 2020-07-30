@@ -14,9 +14,11 @@ Líder do Projeto: Thiago de Oliveira Victorino - thiago.victorino@antt.gov.br
 
 ### Versão Atual:
 
-v-2.0 - 28/04/2020
+v-2.1 - 30/07/2020
 
 Versões anteriores:
+
+v-2.0 - 28/04/2020
 
 v-1.1 - 27/04/2020
 
